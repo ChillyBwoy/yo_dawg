@@ -1,0 +1,872 @@
+{
+  "version": 1,
+  "bpm": 114,
+  "loop_start": 0,
+  "loop_end": 15360,
+  "tracks": [
+    {
+      "name": "01_Pulse_Bass",
+      "channel": 0,
+      "program": 38,
+      "volume": 104,
+      "mute": false,
+      "solo": false,
+      "route": "Internal",
+      "midi_output": null,
+      "notes": [
+        {
+          "start": 0,
+          "duration": 180,
+          "key": 38,
+          "velocity": 104
+        },
+        {
+          "start": 720,
+          "duration": 180,
+          "key": 50,
+          "velocity": 84
+        },
+        {
+          "start": 960,
+          "duration": 180,
+          "key": 38,
+          "velocity": 84
+        },
+        {
+          "start": 1680,
+          "duration": 180,
+          "key": 45,
+          "velocity": 84
+        },
+        {
+          "start": 1920,
+          "duration": 180,
+          "key": 38,
+          "velocity": 104
+        },
+        {
+          "start": 2640,
+          "duration": 180,
+          "key": 50,
+          "velocity": 84
+        },
+        {
+          "start": 2880,
+          "duration": 180,
+          "key": 38,
+          "velocity": 84
+        },
+        {
+          "start": 3600,
+          "duration": 180,
+          "key": 45,
+          "velocity": 84
+        },
+        {
+          "start": 3840,
+          "duration": 180,
+          "key": 35,
+          "velocity": 104
+        },
+        {
+          "start": 4560,
+          "duration": 180,
+          "key": 47,
+          "velocity": 84
+        },
+        {
+          "start": 4800,
+          "duration": 180,
+          "key": 35,
+          "velocity": 84
+        },
+        {
+          "start": 5520,
+          "duration": 180,
+          "key": 42,
+          "velocity": 84
+        },
+        {
+          "start": 5760,
+          "duration": 180,
+          "key": 35,
+          "velocity": 104
+        },
+        {
+          "start": 6480,
+          "duration": 180,
+          "key": 47,
+          "velocity": 84
+        },
+        {
+          "start": 6720,
+          "duration": 180,
+          "key": 35,
+          "velocity": 84
+        },
+        {
+          "start": 7440,
+          "duration": 180,
+          "key": 42,
+          "velocity": 84
+        },
+        {
+          "start": 7680,
+          "duration": 180,
+          "key": 31,
+          "velocity": 104
+        },
+        {
+          "start": 8400,
+          "duration": 180,
+          "key": 43,
+          "velocity": 84
+        },
+        {
+          "start": 8640,
+          "duration": 180,
+          "key": 31,
+          "velocity": 84
+        },
+        {
+          "start": 9360,
+          "duration": 180,
+          "key": 38,
+          "velocity": 84
+        },
+        {
+          "start": 9600,
+          "duration": 180,
+          "key": 31,
+          "velocity": 104
+        },
+        {
+          "start": 10320,
+          "duration": 180,
+          "key": 43,
+          "velocity": 84
+        },
+        {
+          "start": 10560,
+          "duration": 180,
+          "key": 31,
+          "velocity": 84
+        },
+        {
+          "start": 11280,
+          "duration": 180,
+          "key": 38,
+          "velocity": 84
+        },
+        {
+          "start": 11520,
+          "duration": 180,
+          "key": 33,
+          "velocity": 104
+        },
+        {
+          "start": 12240,
+          "duration": 180,
+          "key": 45,
+          "velocity": 84
+        },
+        {
+          "start": 12480,
+          "duration": 180,
+          "key": 33,
+          "velocity": 84
+        },
+        {
+          "start": 13200,
+          "duration": 180,
+          "key": 40,
+          "velocity": 84
+        },
+        {
+          "start": 13440,
+          "duration": 180,
+          "key": 33,
+          "velocity": 104
+        },
+        {
+          "start": 14160,
+          "duration": 180,
+          "key": 45,
+          "velocity": 84
+        },
+        {
+          "start": 14400,
+          "duration": 180,
+          "key": 33,
+          "velocity": 84
+        },
+        {
+          "start": 15120,
+          "duration": 180,
+          "key": 40,
+          "velocity": 84
+        }
+      ]
+    },
+    {
+      "name": "02_Glass_Chords",
+      "channel": 1,
+      "program": 88,
+      "volume": 78,
+      "mute": false,
+      "solo": false,
+      "route": "Internal",
+      "midi_output": null,
+      "notes": [
+        {
+          "start": 0,
+          "duration": 3720,
+          "key": 62,
+          "velocity": 54
+        },
+        {
+          "start": 0,
+          "duration": 3720,
+          "key": 66,
+          "velocity": 54
+        },
+        {
+          "start": 0,
+          "duration": 3720,
+          "key": 69,
+          "velocity": 54
+        },
+        {
+          "start": 0,
+          "duration": 3720,
+          "key": 73,
+          "velocity": 54
+        },
+        {
+          "start": 3840,
+          "duration": 3720,
+          "key": 59,
+          "velocity": 54
+        },
+        {
+          "start": 3840,
+          "duration": 3720,
+          "key": 62,
+          "velocity": 54
+        },
+        {
+          "start": 3840,
+          "duration": 3720,
+          "key": 66,
+          "velocity": 54
+        },
+        {
+          "start": 3840,
+          "duration": 3720,
+          "key": 69,
+          "velocity": 54
+        },
+        {
+          "start": 7680,
+          "duration": 3720,
+          "key": 55,
+          "velocity": 54
+        },
+        {
+          "start": 7680,
+          "duration": 3720,
+          "key": 59,
+          "velocity": 54
+        },
+        {
+          "start": 7680,
+          "duration": 3720,
+          "key": 62,
+          "velocity": 54
+        },
+        {
+          "start": 7680,
+          "duration": 3720,
+          "key": 66,
+          "velocity": 54
+        },
+        {
+          "start": 11520,
+          "duration": 3720,
+          "key": 57,
+          "velocity": 54
+        },
+        {
+          "start": 11520,
+          "duration": 3720,
+          "key": 61,
+          "velocity": 54
+        },
+        {
+          "start": 11520,
+          "duration": 3720,
+          "key": 64,
+          "velocity": 54
+        },
+        {
+          "start": 11520,
+          "duration": 3720,
+          "key": 67,
+          "velocity": 54
+        }
+      ]
+    },
+    {
+      "name": "03_Neon_Lead",
+      "channel": 2,
+      "program": 81,
+      "volume": 106,
+      "mute": false,
+      "solo": false,
+      "route": "Internal",
+      "midi_output": null,
+      "notes": [
+        {
+          "start": 0,
+          "duration": 360,
+          "key": 74,
+          "velocity": 92
+        },
+        {
+          "start": 720,
+          "duration": 180,
+          "key": 69,
+          "velocity": 82
+        },
+        {
+          "start": 1200,
+          "duration": 480,
+          "key": 73,
+          "velocity": 82
+        },
+        {
+          "start": 2160,
+          "duration": 240,
+          "key": 66,
+          "velocity": 82
+        },
+        {
+          "start": 2640,
+          "duration": 360,
+          "key": 71,
+          "velocity": 82
+        },
+        {
+          "start": 3360,
+          "duration": 360,
+          "key": 69,
+          "velocity": 82
+        },
+        {
+          "start": 3840,
+          "duration": 480,
+          "key": 71,
+          "velocity": 92
+        },
+        {
+          "start": 4800,
+          "duration": 180,
+          "key": 66,
+          "velocity": 82
+        },
+        {
+          "start": 5160,
+          "duration": 360,
+          "key": 74,
+          "velocity": 82
+        },
+        {
+          "start": 6000,
+          "duration": 360,
+          "key": 73,
+          "velocity": 82
+        },
+        {
+          "start": 6720,
+          "duration": 240,
+          "key": 69,
+          "velocity": 82
+        },
+        {
+          "start": 7200,
+          "duration": 240,
+          "key": 66,
+          "velocity": 82
+        },
+        {
+          "start": 7680,
+          "duration": 360,
+          "key": 67,
+          "velocity": 92
+        },
+        {
+          "start": 8400,
+          "duration": 240,
+          "key": 74,
+          "velocity": 82
+        },
+        {
+          "start": 8880,
+          "duration": 480,
+          "key": 71,
+          "velocity": 82
+        },
+        {
+          "start": 9840,
+          "duration": 240,
+          "key": 69,
+          "velocity": 82
+        },
+        {
+          "start": 10320,
+          "duration": 360,
+          "key": 66,
+          "velocity": 82
+        },
+        {
+          "start": 11040,
+          "duration": 360,
+          "key": 62,
+          "velocity": 82
+        },
+        {
+          "start": 11520,
+          "duration": 480,
+          "key": 64,
+          "velocity": 92
+        },
+        {
+          "start": 12480,
+          "duration": 240,
+          "key": 73,
+          "velocity": 82
+        },
+        {
+          "start": 12960,
+          "duration": 360,
+          "key": 71,
+          "velocity": 82
+        },
+        {
+          "start": 13440,
+          "duration": 360,
+          "key": 69,
+          "velocity": 92
+        },
+        {
+          "start": 14160,
+          "duration": 180,
+          "key": 67,
+          "velocity": 82
+        },
+        {
+          "start": 14640,
+          "duration": 600,
+          "key": 64,
+          "velocity": 82
+        }
+      ]
+    },
+    {
+      "name": "04_Clockwork_Arp",
+      "channel": 3,
+      "program": 80,
+      "volume": 68,
+      "mute": false,
+      "solo": false,
+      "route": "Internal",
+      "midi_output": null,
+      "notes": [
+        {
+          "start": 0,
+          "duration": 120,
+          "key": 74,
+          "velocity": 58
+        },
+        {
+          "start": 240,
+          "duration": 120,
+          "key": 81,
+          "velocity": 46
+        },
+        {
+          "start": 480,
+          "duration": 120,
+          "key": 78,
+          "velocity": 58
+        },
+        {
+          "start": 720,
+          "duration": 120,
+          "key": 85,
+          "velocity": 46
+        },
+        {
+          "start": 960,
+          "duration": 120,
+          "key": 81,
+          "velocity": 58
+        },
+        {
+          "start": 1200,
+          "duration": 120,
+          "key": 74,
+          "velocity": 46
+        },
+        {
+          "start": 1440,
+          "duration": 120,
+          "key": 85,
+          "velocity": 58
+        },
+        {
+          "start": 1680,
+          "duration": 120,
+          "key": 78,
+          "velocity": 46
+        },
+        {
+          "start": 1920,
+          "duration": 120,
+          "key": 74,
+          "velocity": 58
+        },
+        {
+          "start": 2160,
+          "duration": 120,
+          "key": 81,
+          "velocity": 46
+        },
+        {
+          "start": 2400,
+          "duration": 120,
+          "key": 78,
+          "velocity": 58
+        },
+        {
+          "start": 2640,
+          "duration": 120,
+          "key": 85,
+          "velocity": 46
+        },
+        {
+          "start": 2880,
+          "duration": 120,
+          "key": 81,
+          "velocity": 58
+        },
+        {
+          "start": 3120,
+          "duration": 120,
+          "key": 74,
+          "velocity": 46
+        },
+        {
+          "start": 3360,
+          "duration": 120,
+          "key": 85,
+          "velocity": 58
+        },
+        {
+          "start": 3600,
+          "duration": 120,
+          "key": 78,
+          "velocity": 46
+        },
+        {
+          "start": 3840,
+          "duration": 120,
+          "key": 71,
+          "velocity": 58
+        },
+        {
+          "start": 4080,
+          "duration": 120,
+          "key": 78,
+          "velocity": 46
+        },
+        {
+          "start": 4320,
+          "duration": 120,
+          "key": 74,
+          "velocity": 58
+        },
+        {
+          "start": 4560,
+          "duration": 120,
+          "key": 81,
+          "velocity": 46
+        },
+        {
+          "start": 4800,
+          "duration": 120,
+          "key": 78,
+          "velocity": 58
+        },
+        {
+          "start": 5040,
+          "duration": 120,
+          "key": 71,
+          "velocity": 46
+        },
+        {
+          "start": 5280,
+          "duration": 120,
+          "key": 81,
+          "velocity": 58
+        },
+        {
+          "start": 5520,
+          "duration": 120,
+          "key": 74,
+          "velocity": 46
+        },
+        {
+          "start": 5760,
+          "duration": 120,
+          "key": 71,
+          "velocity": 58
+        },
+        {
+          "start": 6000,
+          "duration": 120,
+          "key": 78,
+          "velocity": 46
+        },
+        {
+          "start": 6240,
+          "duration": 120,
+          "key": 74,
+          "velocity": 58
+        },
+        {
+          "start": 6480,
+          "duration": 120,
+          "key": 81,
+          "velocity": 46
+        },
+        {
+          "start": 6720,
+          "duration": 120,
+          "key": 78,
+          "velocity": 58
+        },
+        {
+          "start": 6960,
+          "duration": 120,
+          "key": 71,
+          "velocity": 46
+        },
+        {
+          "start": 7200,
+          "duration": 120,
+          "key": 81,
+          "velocity": 58
+        },
+        {
+          "start": 7440,
+          "duration": 120,
+          "key": 74,
+          "velocity": 46
+        },
+        {
+          "start": 7680,
+          "duration": 120,
+          "key": 67,
+          "velocity": 58
+        },
+        {
+          "start": 7920,
+          "duration": 120,
+          "key": 74,
+          "velocity": 46
+        },
+        {
+          "start": 8160,
+          "duration": 120,
+          "key": 71,
+          "velocity": 58
+        },
+        {
+          "start": 8400,
+          "duration": 120,
+          "key": 78,
+          "velocity": 46
+        },
+        {
+          "start": 8640,
+          "duration": 120,
+          "key": 74,
+          "velocity": 58
+        },
+        {
+          "start": 8880,
+          "duration": 120,
+          "key": 67,
+          "velocity": 46
+        },
+        {
+          "start": 9120,
+          "duration": 120,
+          "key": 78,
+          "velocity": 58
+        },
+        {
+          "start": 9360,
+          "duration": 120,
+          "key": 71,
+          "velocity": 46
+        },
+        {
+          "start": 9600,
+          "duration": 120,
+          "key": 67,
+          "velocity": 58
+        },
+        {
+          "start": 9840,
+          "duration": 120,
+          "key": 74,
+          "velocity": 46
+        },
+        {
+          "start": 10080,
+          "duration": 120,
+          "key": 71,
+          "velocity": 58
+        },
+        {
+          "start": 10320,
+          "duration": 120,
+          "key": 78,
+          "velocity": 46
+        },
+        {
+          "start": 10560,
+          "duration": 120,
+          "key": 74,
+          "velocity": 58
+        },
+        {
+          "start": 10800,
+          "duration": 120,
+          "key": 67,
+          "velocity": 46
+        },
+        {
+          "start": 11040,
+          "duration": 120,
+          "key": 78,
+          "velocity": 58
+        },
+        {
+          "start": 11280,
+          "duration": 120,
+          "key": 71,
+          "velocity": 46
+        },
+        {
+          "start": 11520,
+          "duration": 120,
+          "key": 69,
+          "velocity": 58
+        },
+        {
+          "start": 11760,
+          "duration": 120,
+          "key": 76,
+          "velocity": 46
+        },
+        {
+          "start": 12000,
+          "duration": 120,
+          "key": 73,
+          "velocity": 58
+        },
+        {
+          "start": 12240,
+          "duration": 120,
+          "key": 79,
+          "velocity": 46
+        },
+        {
+          "start": 12480,
+          "duration": 120,
+          "key": 76,
+          "velocity": 58
+        },
+        {
+          "start": 12720,
+          "duration": 120,
+          "key": 69,
+          "velocity": 46
+        },
+        {
+          "start": 12960,
+          "duration": 120,
+          "key": 79,
+          "velocity": 58
+        },
+        {
+          "start": 13200,
+          "duration": 120,
+          "key": 73,
+          "velocity": 46
+        },
+        {
+          "start": 13440,
+          "duration": 120,
+          "key": 69,
+          "velocity": 58
+        },
+        {
+          "start": 13680,
+          "duration": 120,
+          "key": 76,
+          "velocity": 46
+        },
+        {
+          "start": 13920,
+          "duration": 120,
+          "key": 73,
+          "velocity": 58
+        },
+        {
+          "start": 14160,
+          "duration": 120,
+          "key": 79,
+          "velocity": 46
+        },
+        {
+          "start": 14400,
+          "duration": 120,
+          "key": 76,
+          "velocity": 58
+        },
+        {
+          "start": 14640,
+          "duration": 120,
+          "key": 69,
+          "velocity": 46
+        },
+        {
+          "start": 14880,
+          "duration": 120,
+          "key": 79,
+          "velocity": 58
+        },
+        {
+          "start": 15120,
+          "duration": 120,
+          "key": 73,
+          "velocity": 46
+        }
+      ]
+    }
+  ]
+}
