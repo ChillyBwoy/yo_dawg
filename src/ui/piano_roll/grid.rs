@@ -1,4 +1,4 @@
-use super::theme::{ACCENT, BG, LIVE_NOTE, LIVE_ROW, MUTED};
+use crate::ui::theme::{ACCENT, BG, LIVE_NOTE, LIVE_ROW, MUTED};
 use crate::{
     app::App,
     engine::NoteSnapshot,
@@ -11,9 +11,6 @@ use ratatui::{
     style::{Color, Modifier, Style},
     widgets::{Block, Widget},
 };
-
-#[cfg(test)]
-mod piano_roll_tests;
 
 pub(super) fn draw(f: &mut Frame, app: &App, area: Rect) {
     let t = &app.project.tracks[app.track];

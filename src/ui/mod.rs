@@ -4,11 +4,10 @@ mod dialogs;
 mod piano_roll;
 mod status;
 mod theme;
-mod tracks;
+mod tracker;
 mod transport;
-mod velocity;
 
-use crate::app::App;
+use crate::app::{App, ViewMode};
 use ratatui::{
     Frame,
     layout::{Constraint, Layout},
@@ -38,19 +37,19 @@ pub fn draw(f: &mut Frame, app: &mut App) {
         Constraint::Length(3),
     ])
     .split(area);
-    let middle = Layout::horizontal([Constraint::Length(24), Constraint::Min(20)]).split(rows[1]);
-    let resized = app.roll != middle[1];
-    app.track_area = middle[0];
-    app.roll = middle[1];
-    app.velocity_area = rows[2];
-    if resized {
-        app.ensure_visible();
-    }
-
     transport::draw(f, app, rows[0]);
-    tracks::draw(f, app, middle[0]);
-    piano_roll::draw(f, app, middle[1]);
-    velocity::draw(f, app, rows[2]);
+    match app.view {
+        ViewMode::PianoRoll => {
+            piano_roll::draw(f, app, rows[1], rows[2]);
+        }
+        ViewMode::Tracker => {
+            app.track_area = Default::default();
+            app.velocity_area = Default::default();
+            app.prepare_tracker(rows[1]);
+            tracker::draw(f, app, rows[1]);
+            tracker::details(f, app, rows[2]);
+        }
+    }
     status::draw(f, app, rows[3]);
     dialogs::draw(f, app);
 }

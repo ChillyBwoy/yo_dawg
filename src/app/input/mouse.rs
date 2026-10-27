@@ -1,5 +1,5 @@
 use crate::{
-    app::{App, Drag},
+    app::{App, Drag, ViewMode},
     model::BAR,
 };
 use crossterm::event::{
@@ -25,6 +25,10 @@ impl App {
             || self.settings
             || self.quit_confirm
         {
+            return;
+        }
+        if self.view == ViewMode::Tracker {
+            self.tracker_mouse(event);
             return;
         }
         if event.kind == MouseEventKind::Down(MouseButton::Left)

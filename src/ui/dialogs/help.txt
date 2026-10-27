@@ -1,4 +1,5 @@
 l                loop length in bars         q / Ctrl+Q        quit (asks if unsaved)
+F4               piano roll / tracker
 Space            play / stop (loop)          R                 arm MIDI recording
 Arrows           move cursor                 Enter             toggle note
 Shift+arrows     move selected notes         Ctrl+←/→          change length

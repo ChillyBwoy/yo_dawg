@@ -1,5 +1,5 @@
-use super::theme::ACCENT;
 use crate::app::App;
+use crate::ui::theme::ACCENT;
 use ratatui::{
     Frame,
     layout::Rect,

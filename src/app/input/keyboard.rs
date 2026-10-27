@@ -1,5 +1,5 @@
 use crate::{
-    app::{Action, App, FileAction, InstrumentPicker},
+    app::{Action, App, FileAction, InstrumentPicker, ViewMode},
     engine::Command,
     model::{BAR, Track},
 };
@@ -23,6 +23,17 @@ impl App {
         }
         if event.modifiers.contains(M::CONTROL) {
             self.handle_control_key(key);
+            return;
+        }
+        if key == K::F(4) {
+            self.set_view(if self.view == ViewMode::PianoRoll {
+                ViewMode::Tracker
+            } else {
+                ViewMode::PianoRoll
+            });
+            return;
+        }
+        if self.view == ViewMode::Tracker && self.handle_tracker_key(event) {
             return;
         }
         match key {
@@ -150,7 +161,7 @@ impl App {
             K::Enter | K::Insert => self.toggle_note(),
             K::Delete | K::Backspace => self.delete(),
             K::Char('v') => {
-                if let Some(i) = self.note_at(self.cursor, self.key) {
+                if let Some(i) = self.note_under_cursor() {
                     if !self.selected.insert(i) {
                         self.selected.remove(&i);
                     }
@@ -166,6 +177,7 @@ impl App {
         // Follow deliberate cursor navigation only, and only along its axis.
         // Other shortcuts must preserve a viewport scrolled away from the cursor.
         match key {
+            _ if self.view == ViewMode::Tracker => {}
             K::Left | K::Right if !shift => self.ensure_time_visible(),
             K::Up | K::Down if !shift => self.ensure_pitch_visible(),
             K::Home => self.ensure_time_visible(),

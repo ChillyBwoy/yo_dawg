@@ -17,7 +17,7 @@ pub(super) fn draw(f: &mut Frame, app: &mut App) {
         routing::draw(f, app);
     }
     if app.help {
-        help::draw(f);
+        help::draw(f, app.view);
     }
     if app.instrument_picker.is_some() {
         instrument_picker::draw(f, app);

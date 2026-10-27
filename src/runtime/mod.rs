@@ -34,6 +34,7 @@ pub fn run() -> Result<()> {
     if options.demo {
         app.dirty = true;
     }
+    app.set_view(options.view);
     terminal::run(&mut app, errors)?;
     drop(app);
     drop(audio);

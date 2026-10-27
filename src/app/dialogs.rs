@@ -18,6 +18,7 @@ pub enum Action {
     LoopStart,
     LoopEnd,
     Length,
+    EditNote,
 }
 
 pub struct InstrumentPicker {
@@ -39,6 +40,7 @@ impl App {
                     | Action::LoopStart
                     | Action::LoopEnd
                     | Action::Length
+                    | Action::EditNote
             ),
         });
     }
@@ -128,6 +130,9 @@ impl App {
     }
 
     fn apply_project_setting(&mut self, action: Action, text: &str) -> Result<()> {
+        if matches!(action, Action::EditNote) {
+            return self.apply_tracker_note(text);
+        }
         let mut candidate = self.project.clone();
         let t = &mut candidate.tracks[self.track];
         match action {
@@ -153,6 +158,7 @@ impl App {
                     candidate.loop_end = tick;
                 }
             }
+            Action::EditNote => unreachable!(),
         }
         candidate.validate()?;
         self.finish_recording();

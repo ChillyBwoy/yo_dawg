@@ -3,6 +3,7 @@ use crate::{
     audio::{Audio, Options},
     engine::{Command, Engine},
     model::Project,
+    ui::theme::{LIVE_NOTE, LIVE_ROW},
 };
 use ratatui::{Terminal, backend::TestBackend};
 use std::time::{Duration, Instant};

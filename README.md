@@ -1,6 +1,6 @@
 # yo_dawg
 
-A terminal MIDI sequencer for macOS and Linux with a piano roll, up to 16 tracks, built-in synthesis, and external MIDI support.
+A terminal MIDI sequencer for macOS and Linux with piano roll and tracker views, up to 16 tracks, built-in synthesis, and external MIDI support.
 
 ## Run
 
@@ -36,6 +36,7 @@ Without a SoundFont, the built-in synthesizer provides four basic timbres. No SF
 | Keys | Action |
 | --- | --- |
 | `Space` | Play / stop |
+| `F4` | Switch piano roll / tracker |
 | Arrows | Move the cursor |
 | `Enter` / `Delete` | Add / remove notes |
 | `Shift+arrows` | Move selected notes |
@@ -49,6 +50,8 @@ Without a SoundFont, the built-in synthesizer provides four basic timbres. No SF
 | `!`, `?`, `q` | Panic, full help, quit |
 
 Click to draw or select notes; drag the body to move them or the right edge to resize. Right-click deletes. The wheel scrolls pitches, `Shift+wheel` scrolls time, and `Ctrl+wheel` zooms.
+
+In tracker view, time runs down the rows and tracks use horizontal note columns. `↑/↓` move through time, `←/→` select columns, and `PageUp/PageDown` move by a page. `e` edits pitch, velocity, length, and start time; `Shift+Enter` adds a chord voice. `Alt+↑/↓` changes the entry pitch. File, instrument, playback, and editing commands are shared. Switching views preserves project data and each view's scroll position; chords and off-grid timing are not converted or quantized. Start directly in tracker mode with `--view tracker`.
 
 File dialogs support arrows, PageUp/PageDown, `Enter` to confirm, `Tab` to switch to the path field, and `Esc` to cancel. Existing files require overwrite confirmation. `Ctrl+I` also imports MIDI in terminals that distinguish it from `Tab`; otherwise use `F3`.
 

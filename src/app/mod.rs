@@ -7,6 +7,7 @@ mod history;
 mod input;
 mod recording;
 mod routing;
+pub mod tracker;
 mod viewport;
 
 use crate::{
@@ -22,6 +23,7 @@ use std::{
     path::PathBuf,
     sync::atomic::Ordering,
 };
+pub use tracker::{TrackerState, ViewMode};
 
 #[derive(Clone)]
 struct Drag {
@@ -38,6 +40,8 @@ pub struct App {
     pub engine: Engine,
     pub audio: AudioSink,
     pub instruments: Instruments,
+    pub view: ViewMode,
+    pub tracker: TrackerState,
     pub track: usize,
     pub cursor: u32,
     pub key: u8,
@@ -86,6 +90,8 @@ impl App {
             engine,
             audio,
             instruments,
+            view: ViewMode::PianoRoll,
+            tracker: TrackerState::default(),
             path,
             track: 0,
             cursor: 0,
@@ -146,6 +152,10 @@ impl App {
         self.track = index.min(self.project.tracks.len() - 1);
         self.selected.clear();
         self.engine.send(Command::Selected(self.track));
+        if self.view == ViewMode::Tracker {
+            self.tracker.lane = 0;
+            self.ensure_tracker_column_visible();
+        }
     }
 
     fn request_quit(&mut self) {

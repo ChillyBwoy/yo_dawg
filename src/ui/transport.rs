@@ -33,7 +33,10 @@ pub(super) fn draw(f: &mut Frame, app: &App, area: Rect) {
     f.render_widget(
         Paragraph::new(text)
             .style(Style::default().fg(ACCENT))
-            .block(Block::bordered().title(" yo_dawg · TUI DAW ")),
+            .block(
+                Block::bordered()
+                    .title(format!(" yo_dawg · {} · F4 switch view ", app.view.label())),
+            ),
         area,
     );
 }

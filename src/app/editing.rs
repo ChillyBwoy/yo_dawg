@@ -1,8 +1,15 @@
-use super::App;
+use super::{App, ViewMode};
 use crate::model::{BAR, Note, snap};
 use std::collections::HashSet;
 
 impl App {
+    pub(super) fn note_under_cursor(&self) -> Option<usize> {
+        if self.view == ViewMode::Tracker {
+            self.tracker_note_index()
+        } else {
+            self.note_at(self.cursor, self.key)
+        }
+    }
     pub(super) fn note_at(&self, tick: u32, key: u8) -> Option<usize> {
         self.project.tracks[self.track]
             .notes
@@ -12,14 +19,14 @@ impl App {
 
     pub(super) fn targets(&self) -> Vec<usize> {
         if self.selected.is_empty() {
-            self.note_at(self.cursor, self.key).into_iter().collect()
+            self.note_under_cursor().into_iter().collect()
         } else {
             self.selected.iter().copied().collect()
         }
     }
 
     pub(super) fn toggle_note(&mut self) {
-        if let Some(i) = self.note_at(self.cursor, self.key) {
+        if let Some(i) = self.note_under_cursor() {
             self.selected.clear();
             self.selected.insert(i);
             self.delete();
