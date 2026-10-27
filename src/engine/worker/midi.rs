@@ -100,6 +100,7 @@ impl Worker {
     }
 
     pub(super) fn connect_input(&mut self, name: Option<String>) {
+        self.live_notes.clear();
         self.panic();
         self.input = None;
         let Some(name) = name else {
@@ -143,11 +144,25 @@ impl Worker {
             return;
         }
         let status = data[0] & 0xF0;
+        let channel = data[0] & 0x0F;
+        if status == 0xB0 && matches!(data[1], 120 | 123) {
+            let notes = self.live_notes.channel(self.selected, channel);
+            for key in 0..128 {
+                if notes.contains(key) {
+                    self.live(&[0x80 | channel, key, 0]);
+                }
+            }
+            return;
+        }
         if status != 0x90 && status != 0x80 {
             return;
         }
         let velocity = if status == 0x90 { data[2] } else { 0 };
-        self.note(self.selected, data[1], velocity, true);
+        self.live_notes
+            .set(self.selected, channel, data[1], velocity > 0);
+        if velocity > 0 || !self.live_notes.snapshot(self.selected).contains(data[1]) {
+            self.note(self.selected, data[1], velocity, true);
+        }
         if self.record && self.playing.load(Ordering::Relaxed) {
             let _ = self.events.try_send(Event::Recorded {
                 key: data[1],

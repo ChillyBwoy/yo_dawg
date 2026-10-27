@@ -1,6 +1,7 @@
-use super::theme::{ACCENT, BG, MUTED};
+use super::theme::{ACCENT, BG, LIVE_NOTE, LIVE_ROW, MUTED};
 use crate::{
     app::App,
+    engine::NoteSnapshot,
     model::{BAR, PPQ},
 };
 use ratatui::{
@@ -10,6 +11,9 @@ use ratatui::{
     style::{Color, Modifier, Style},
     widgets::{Block, Widget},
 };
+
+#[cfg(test)]
+mod piano_roll_tests;
 
 pub(super) fn draw(f: &mut Frame, app: &App, area: Rect) {
     let t = &app.project.tracks[app.track];
@@ -22,10 +26,10 @@ pub(super) fn draw(f: &mut Frame, app: &App, area: Rect) {
         t.volume
     );
     f.render_widget(Block::bordered().title(title), area);
-    f.render_widget(Roll(app), area);
+    f.render_widget(Roll(app, app.live_notes()), area);
 }
 
-struct Roll<'a>(&'a App);
+struct Roll<'a>(&'a App, NoteSnapshot);
 struct GridArea {
     x: u16,
     y: u16,
@@ -80,6 +84,7 @@ impl Roll<'_> {
                 break;
             }
             let key = app.top_key - row as u8;
+            let held = self.1.contains(key);
             let black = matches!(key % 12, 1 | 3 | 6 | 8 | 10);
             let color = if black {
                 Color::Rgb(21, 23, 32)
@@ -91,7 +96,14 @@ impl Roll<'_> {
                 y,
                 format!("{:4}", note_name(key)),
                 4,
-                Style::default().fg(if black { MUTED } else { Color::White }),
+                if held {
+                    Style::default()
+                        .bg(LIVE_NOTE)
+                        .fg(Color::White)
+                        .add_modifier(Modifier::BOLD)
+                } else {
+                    Style::default().fg(if black { MUTED } else { Color::White })
+                },
             );
             for x in grid.x..grid.right {
                 let tick = app.offset + ((x - grid.x) / app.cell_width) as u32 * app.grid;
@@ -105,7 +117,13 @@ impl Roll<'_> {
                     } else {
                         " "
                     })
-                    .set_bg(if outside { BG } else { color })
+                    .set_bg(if held {
+                        LIVE_ROW
+                    } else if outside {
+                        BG
+                    } else {
+                        color
+                    })
                     .set_fg(if outside {
                         Color::Rgb(29, 31, 40)
                     } else {
@@ -136,6 +154,7 @@ impl Roll<'_> {
                 .div_ceil(app.grid as u64))
             .min(grid.width as u64) as u16;
             let selected = app.selected.contains(&i);
+            let held = self.1.contains(n.key);
             for col in begin_col..end_col {
                 buf[(grid.x + col, y)]
                     .set_symbol(if col == begin_col {
@@ -145,12 +164,20 @@ impl Roll<'_> {
                     } else {
                         "━"
                     })
-                    .set_bg(if selected {
+                    .set_bg(if held {
+                        LIVE_NOTE
+                    } else if selected {
                         Color::Rgb(139, 111, 40)
                     } else {
                         Color::Rgb(29, 104, 85)
                     })
-                    .set_fg(if selected { Color::Yellow } else { ACCENT });
+                    .set_fg(if selected {
+                        Color::Yellow
+                    } else if held {
+                        Color::White
+                    } else {
+                        ACCENT
+                    });
             }
         }
     }

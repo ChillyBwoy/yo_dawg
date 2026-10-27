@@ -79,6 +79,8 @@ For a short passage, press `l`, enter the number of bars, and press Enter. For e
 3. Press `r` to select `External` or `Both`; use `c` to match the FM-1's receive channel.
 4. To record the FM-1 keyboard, select its MIDI input with `F6`, arm recording with `R`, then press `Space`.
 
+Incoming MIDI notes highlight the matching piano keys, pitch lanes, and note blocks on the selected track, even when playback and recording are stopped. Note Off (including Note On with velocity zero) releases the highlight. Chords and overlapping pitches on different MIDI channels are supported. Stop, Panic, switching tracks, and reconnecting the input clear the highlights; recording updates and loop boundaries do not interrupt held-key indicators. MIDI All Notes Off / All Sound Off messages clear the corresponding input channel. Notes must be within the visible pitch range to see the highlight.
+
 On macOS, BLE MIDI is usually connected through **Audio MIDI Setup → MIDI Studio → Bluetooth**. Linux requires a working system BLE MIDI bridge/stack that exposes the device as an ALSA MIDI port. The application uses ports already exposed by the OS; it does not perform BLE pairing itself. FM-1 compatibility with Linux requires verification on actual hardware.
 
 **MIDI does not transmit audio.** The FM-1 has its own synthesizer, speaker, and 3.5 mm headphone output. USB Audio is not advertised by the manufacturer. To hear its actual sound through the computer, connect the 3.5 mm output to a suitable audio interface line input and start the application with `--input N`. Use an appropriate stereo cable/splitter and match signal levels. Plugging a headphone cable into the FM-1 disables its built-in speaker.

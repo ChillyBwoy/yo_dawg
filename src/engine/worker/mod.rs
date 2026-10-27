@@ -1,9 +1,9 @@
 mod midi;
 mod scheduler;
 #[cfg(test)]
-mod tests;
+mod worker_tests;
 
-use super::{Command, Event};
+use super::{Command, Event, live_notes::LiveNotes};
 use crate::{
     audio::AudioSink,
     model::{PPQ, Project},
@@ -36,6 +36,7 @@ pub(super) struct Worker {
     tick: f64,
     schedule: Vec<Scheduled>,
     dropped: Arc<AtomicBool>,
+    pub(super) live_notes: Arc<LiveNotes>,
 }
 
 impl Worker {
@@ -62,6 +63,7 @@ impl Worker {
             tick: 0.0,
             schedule: Vec::new(),
             dropped: Arc::new(AtomicBool::new(false)),
+            live_notes: Arc::new(LiveNotes::default()),
         }
     }
 
@@ -77,6 +79,7 @@ impl Worker {
                 };
                 match cmd {
                     Command::Reconnect => {
+                        self.live_notes.clear();
                         self.panic();
                         self.outputs.clear();
                         self.configure();
@@ -92,19 +95,25 @@ impl Worker {
                         );
                     }
                     Command::Play(on) => {
+                        self.live_notes.clear();
                         self.panic();
                         self.tick = self.project.loop_start as f64;
                         self.playing.store(on, Ordering::Relaxed);
                         previous = Instant::now();
                     }
-                    Command::Panic => self.panic(),
+                    Command::Panic => {
+                        self.live_notes.clear();
+                        self.panic();
+                    }
                     Command::Input(name) => self.connect_input(name),
                     Command::Selected(i) => {
+                        self.live_notes.clear();
                         self.panic();
                         self.selected = i;
                     }
                     Command::Record(on) => self.record = on,
                     Command::Thru(on) => {
+                        self.live_notes.clear();
                         self.panic();
                         self.thru = on;
                     }
@@ -115,6 +124,7 @@ impl Worker {
             let delta = now.duration_since(previous).as_secs_f64();
             previous = now;
             if self.dropped.swap(false, Ordering::Relaxed) {
+                self.live_notes.clear();
                 self.panic();
                 self.message("MIDI input queue overflow: notes stopped");
             }
@@ -128,6 +138,7 @@ impl Worker {
             self.position.store(self.tick as u32, Ordering::Relaxed);
             thread::sleep(Duration::from_millis(1));
         }
+        self.live_notes.clear();
         self.panic();
     }
 

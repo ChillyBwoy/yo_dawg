@@ -1,11 +1,14 @@
 //! Playback service: command/event channels and ownership of the worker thread.
 
+mod live_notes;
 mod messages;
 mod ports;
 mod worker;
 
 use crate::{audio::AudioSink, model::Project};
 use crossbeam_channel::{Receiver, Sender, bounded};
+use live_notes::LiveNotes;
+pub use live_notes::NoteSnapshot;
 pub use messages::{Command, Event};
 pub use ports::ports;
 use std::{
@@ -22,6 +25,7 @@ pub struct Engine {
     pub events: Receiver<Event>,
     pub position: Arc<AtomicU32>,
     pub playing: Arc<AtomicBool>,
+    live_notes: Arc<LiveNotes>,
     worker: Option<thread::JoinHandle<()>>,
 }
 
@@ -39,18 +43,24 @@ impl Engine {
             position.clone(),
             playing.clone(),
         );
+        let live_notes = worker.live_notes.clone();
         let handle = thread::spawn(move || worker.run(rx));
         Self {
             tx,
             events,
             position,
             playing,
+            live_notes,
             worker: Some(handle),
         }
     }
 
     pub fn send(&self, cmd: Command) {
         let _ = self.tx.send(cmd);
+    }
+
+    pub fn live_notes(&self, track: usize) -> NoteSnapshot {
+        self.live_notes.snapshot(track)
     }
 }
 

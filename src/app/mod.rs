@@ -10,7 +10,7 @@ mod viewport;
 
 use crate::{
     audio::{AudioSink, Instruments},
-    engine::{Command, Engine},
+    engine::{Command, Engine, NoteSnapshot},
     model::{Note, PPQ, Project},
 };
 pub use dialogs::{Action, InstrumentPicker, Prompt};
@@ -123,6 +123,9 @@ impl App {
     }
     pub fn playing(&self) -> bool {
         self.engine.playing.load(Ordering::Relaxed)
+    }
+    pub fn live_notes(&self) -> NoteSnapshot {
+        self.engine.live_notes(self.track)
     }
     pub fn instrument_label(&self) -> String {
         let t = &self.project.tracks[self.track];
