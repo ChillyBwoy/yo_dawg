@@ -62,6 +62,7 @@ fn shortcuts_preserve_manual_scroll() {
     ];
     for (key, modifiers) in shortcuts {
         app.prompt = None;
+        app.file_browser = None;
         app.instrument_picker = None;
         app.help = false;
         app.settings = false;

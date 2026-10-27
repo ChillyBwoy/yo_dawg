@@ -1,21 +1,20 @@
-l                loop length in bars (1 = one bar)
-Space            play / stop (loop)        R             arm MIDI recording
-Arrows           move cursor               Enter         toggle note
-Shift+arrows     move selected notes        Ctrl+←/→      change length
-Ctrl+↑/↓         velocity ±5                v / Shift+click toggle selection
-Ctrl+A           select all notes           Delete        remove notes
-Ctrl+C/X/V       copy / cut / paste         Ctrl+Z/Y      undo / redo
-g                quantize selection         [ / ]         grid finer / coarser
-+ / -            horizontal zoom            PgUp/PgDn     octave
-Tab / Shift+Tab  select track               a             add track (max 16)
-m / s            mute / solo                r             Internal/External/Both
-n / p / c        name / program / channel   < / >         track volume
-b                BPM                        { / }         loop start/end bars
-Ctrl+S/O         save / load project        Ctrl+E/I      export / import MIDI
-F2               routing panel              F5            refresh MIDI ports
-F6 / F7          cycle input / track output F8            external live Thru
-F9               audio monitoring           !             Panic (all notes off)
-q / Ctrl+Q       quit (asks if unsaved)
+l                loop length in bars         q / Ctrl+Q        quit (asks if unsaved)
+Space            play / stop (loop)          R                 arm MIDI recording
+Arrows           move cursor                 Enter             toggle note
+Shift+arrows     move selected notes         Ctrl+←/→          change length
+Ctrl+↑/↓         velocity ±5                 v / Shift+click   toggle selection
+Ctrl+A           select all notes            Delete            remove notes
+Ctrl+C/X/V       copy / cut / paste          Ctrl+Z/Y          undo / redo
+g                quantize selection          [ / ]             grid finer / coarser
++ / -            horizontal zoom             PgUp/PgDn         octave
+Tab / Shift+Tab  select track                a                 add track (max 16)
+m / s            mute / solo                 r                 Internal/External/Both
+n / p / c        name / program / channel    < / >             track volume
+b                BPM                         { / }             loop start/end bars
+Ctrl+S/O         save / load project         Ctrl+E/I          export / import MIDI
+F2 / F3          routing / import MIDI       F5                refresh MIDI ports
+F6 / F7          cycle input / track output  F8                external live Thru
+F9               audio monitoring            !                 Panic (all notes off)
 
 Mouse: left click draws/selects; drag body moves, drag right edge resizes.
 Right click deletes. Wheel scrolls pitches; Shift+wheel scrolls time;

@@ -2,10 +2,23 @@ use crate::{
     app::{App, Drag},
     model::BAR,
 };
-use crossterm::event::{KeyModifiers as M, MouseButton, MouseEvent, MouseEventKind};
+use crossterm::event::{
+    KeyCode, KeyEvent, KeyModifiers as M, MouseButton, MouseEvent, MouseEventKind,
+};
 
 impl App {
     pub fn mouse(&mut self, event: MouseEvent) {
+        if self.file_browser.is_some() {
+            let key = match event.kind {
+                MouseEventKind::ScrollUp => Some(KeyCode::Up),
+                MouseEventKind::ScrollDown => Some(KeyCode::Down),
+                _ => None,
+            };
+            if let Some(key) = key {
+                self.handle_file_browser_key(KeyEvent::new(key, M::NONE));
+            }
+            return;
+        }
         if self.prompt.is_some()
             || self.instrument_picker.is_some()
             || self.help

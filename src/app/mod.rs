@@ -2,6 +2,7 @@
 
 mod dialogs;
 mod editing;
+mod file_browser;
 mod history;
 mod input;
 mod recording;
@@ -14,6 +15,7 @@ use crate::{
     model::{Note, PPQ, Project},
 };
 pub use dialogs::{Action, InstrumentPicker, Prompt};
+pub use file_browser::{BrowserFocus, FileAction, FileBrowser};
 use ratatui::layout::Rect;
 use std::{
     collections::{HashMap, HashSet},
@@ -49,6 +51,7 @@ pub struct App {
     pub dirty: bool,
     pub path: PathBuf,
     pub prompt: Option<Prompt>,
+    pub file_browser: Option<FileBrowser>,
     pub instrument_picker: Option<InstrumentPicker>,
     pub help: bool,
     pub settings: bool,
@@ -67,6 +70,7 @@ pub struct App {
     redo: Vec<Project>,
     drag: Option<Drag>,
     recording_notes: HashMap<(usize, u8), (u32, u8)>,
+    last_file_directory: Option<PathBuf>,
 }
 
 impl App {
@@ -95,6 +99,7 @@ impl App {
             status: "Space: play | Enter: draw | ?: help | F2: routing".into(),
             dirty: false,
             prompt: None,
+            file_browser: None,
             instrument_picker: None,
             help: false,
             settings: false,
@@ -113,6 +118,7 @@ impl App {
             redo: Vec::new(),
             drag: None,
             recording_notes: HashMap::new(),
+            last_file_directory: None,
         };
         app.refresh_ports();
         app

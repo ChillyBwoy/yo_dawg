@@ -2,15 +2,21 @@ use crate::{app::App, ui};
 use anyhow::Result;
 use crossbeam_channel::Receiver;
 use crossterm::{
-    event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyEventKind},
+    event::{
+        self, DisableMouseCapture, EnableMouseCapture, Event, KeyEventKind,
+        KeyboardEnhancementFlags, PopKeyboardEnhancementFlags, PushKeyboardEnhancementFlags,
+    },
     execute,
     terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
 };
 use ratatui::{Terminal, backend::CrosstermBackend};
 use std::{
     io,
+    sync::atomic::{AtomicBool, Ordering},
     time::{Duration, Instant},
 };
+
+static KEYBOARD_ENHANCED: AtomicBool = AtomicBool::new(false);
 
 pub(super) fn run(app: &mut App, errors: Receiver<String>) -> Result<()> {
     let old_hook = std::panic::take_hook();
@@ -20,7 +26,13 @@ pub(super) fn run(app: &mut App, errors: Receiver<String>) -> Result<()> {
     }));
     enable_raw_mode()?;
     let _guard = TerminalGuard;
-    execute!(io::stdout(), EnterAlternateScreen, EnableMouseCapture)?;
+    execute!(
+        io::stdout(),
+        EnterAlternateScreen,
+        EnableMouseCapture,
+        PushKeyboardEnhancementFlags(KeyboardEnhancementFlags::DISAMBIGUATE_ESCAPE_CODES)
+    )?;
+    KEYBOARD_ENHANCED.store(true, Ordering::Relaxed);
     let mut terminal = Terminal::new(CrosstermBackend::new(io::stdout()))?;
     let mut last_frame = Instant::now() - Duration::from_secs(1);
     while !app.quit {
@@ -52,6 +64,10 @@ impl Drop for TerminalGuard {
 
 fn restore() {
     let _ = disable_raw_mode();
+    // Both the panic hook and the guard may restore the terminal during unwinding.
+    if KEYBOARD_ENHANCED.swap(false, Ordering::Relaxed) {
+        let _ = execute!(io::stdout(), PopKeyboardEnhancementFlags);
+    }
     let _ = execute!(
         io::stdout(),
         DisableMouseCapture,

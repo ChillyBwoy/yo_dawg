@@ -1,12 +1,7 @@
 use super::App;
-use crate::{
-    engine::Command,
-    model::BAR,
-    persistence::{midi, project},
-};
+use crate::model::BAR;
 use anyhow::Result;
 use crossterm::event::{KeyCode as K, KeyEvent, KeyModifiers as M};
-use std::path::PathBuf;
 
 pub struct Prompt {
     pub label: &'static str,
@@ -17,10 +12,6 @@ pub struct Prompt {
 
 #[derive(Clone, Copy)]
 pub enum Action {
-    Save,
-    Load,
-    Export,
-    Import,
     Rename,
     Channel,
     Bpm,
@@ -60,6 +51,10 @@ impl App {
                 K::Char('y') | K::Char('Y') => self.quit = true,
                 _ => self.quit_confirm = false,
             }
+            return true;
+        }
+        if self.file_browser.is_some() {
+            self.handle_file_browser_key(event);
             return true;
         }
         if self.instrument_picker.is_some() {
@@ -124,48 +119,12 @@ impl App {
             }
             K::Enter => {
                 let prompt = self.prompt.take().unwrap();
-                if let Err(e) = self.apply_prompt(prompt) {
+                if let Err(e) = self.apply_project_setting(prompt.action, &prompt.text) {
                     self.status = format!("Error: {e:#}");
                 }
             }
             _ => {}
         }
-    }
-
-    fn apply_prompt(&mut self, prompt: Prompt) -> Result<()> {
-        let path = PathBuf::from(&prompt.text);
-        match prompt.action {
-            Action::Save => {
-                project::save(&self.project, &path)?;
-                self.path = path;
-                self.dirty = false;
-                self.status = "Project saved".into();
-            }
-            Action::Load | Action::Import => {
-                let p = match prompt.action {
-                    Action::Load => project::load(&path)?,
-                    _ => midi::import(&path)?,
-                };
-                self.finish_recording();
-                self.engine.send(Command::Play(false));
-                self.checkpoint();
-                self.project = p;
-                self.select_track(0);
-                self.cursor = self.project.loop_start;
-                self.sync();
-                if matches!(prompt.action, Action::Load) {
-                    self.path = path;
-                    self.dirty = false;
-                }
-                self.status = "Project loaded".into();
-            }
-            Action::Export => {
-                midi::export(&self.project, &path)?;
-                self.status = "MIDI exported".into();
-            }
-            action => self.apply_project_setting(action, &prompt.text)?,
-        }
-        Ok(())
     }
 
     fn apply_project_setting(&mut self, action: Action, text: &str) -> Result<()> {
@@ -194,7 +153,6 @@ impl App {
                     candidate.loop_end = tick;
                 }
             }
-            _ => {}
         }
         candidate.validate()?;
         self.finish_recording();

@@ -1,5 +1,5 @@
 use crate::{
-    app::{Action, App, InstrumentPicker},
+    app::{Action, App, FileAction, InstrumentPicker},
     engine::Command,
     model::{BAR, Track},
 };
@@ -29,6 +29,7 @@ impl App {
             K::Char('q') => self.request_quit(),
             K::Char('?') | K::F(1) => self.help = true,
             K::F(2) => self.settings = !self.settings,
+            K::F(3) => self.open_file_browser(FileAction::ImportMidi),
             K::F(5) => self.refresh_ports(),
             K::F(6) => self.cycle_input(),
             K::F(7) => self.cycle_output(),

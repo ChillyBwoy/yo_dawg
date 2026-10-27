@@ -1,3 +1,4 @@
+mod file_browser;
 mod help;
 mod instrument_picker;
 mod routing;
@@ -20,6 +21,9 @@ pub(super) fn draw(f: &mut Frame, app: &mut App) {
     }
     if app.instrument_picker.is_some() {
         instrument_picker::draw(f, app);
+    }
+    if app.file_browser.is_some() {
+        file_browser::draw(f, app);
     }
     if let Some(prompt) = &app.prompt {
         draw_prompt(f, prompt);
