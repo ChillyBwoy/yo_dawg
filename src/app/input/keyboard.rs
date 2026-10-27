@@ -23,7 +23,6 @@ impl App {
         }
         if event.modifiers.contains(M::CONTROL) {
             self.handle_control_key(key);
-            self.ensure_visible();
             return;
         }
         match key {
@@ -163,6 +162,14 @@ impl App {
             K::Char('-') => self.cell_width = self.cell_width.saturating_sub(1).max(1),
             _ => {}
         }
-        self.ensure_visible();
+        // Follow deliberate cursor navigation only, and only along its axis.
+        // Other shortcuts must preserve a viewport scrolled away from the cursor.
+        match key {
+            K::Left | K::Right if !shift => self.ensure_time_visible(),
+            K::Up | K::Down if !shift => self.ensure_pitch_visible(),
+            K::Home => self.ensure_time_visible(),
+            K::PageUp | K::PageDown => self.ensure_pitch_visible(),
+            _ => {}
+        }
     }
 }

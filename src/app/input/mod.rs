@@ -3,3 +3,6 @@
 mod keyboard;
 mod mouse;
 mod shortcuts;
+
+#[cfg(test)]
+mod keyboard_tests;
