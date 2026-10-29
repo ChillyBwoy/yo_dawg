@@ -44,7 +44,7 @@ Without a SoundFont, the built-in synthesizer provides four basic timbres. No SF
 | `[` / `]`, `+` / `-` | Grid resolution, zoom |
 | `Tab` / `Shift+Tab`, `a` | Select / add a track |
 | `p`, `m`, `s` | Instrument picker, mute, solo |
-| `b`, `l` | Tempo, loop length in bars |
+| `b`, `l`, `L` | Tempo, selected track length, project cycle length |
 | `Ctrl+C/X/V`, `Ctrl+Z/Y` | Copy / cut / paste, undo / redo |
 | `Ctrl+S/O`, `Ctrl+E`, `F3` | Save / open project, export / import MIDI |
 | `!`, `?`, `q` | Panic, full help, quit |
@@ -52,6 +52,8 @@ Without a SoundFont, the built-in synthesizer provides four basic timbres. No SF
 Click to draw or select notes; drag the body to move them or the right edge to resize. Right-click deletes. The wheel scrolls pitches, `Shift+wheel` scrolls time, and `Ctrl+wheel` zooms.
 
 In tracker view, time runs down the rows and tracks use horizontal note columns. `↑/↓` move through time, `←/→` select columns, and `PageUp/PageDown` move by a page. `e` edits pitch, velocity, length, and start time; `Shift+Enter` adds a chord voice. `Alt+↑/↓` changes the entry pitch. File, instrument, playback, and editing commands are shared. Switching views preserves project data and each view's scroll position; chords and off-grid timing are not converted or quantized. Start directly in tracker mode with `--view tracker`.
+
+Each track can loop independently. Press `l` and enter bars (`1`, `3`, etc.) or ticks (`480t`); `0` inherits the project cycle, shown with `~`. `L` changes the project cycle. For example, 3-bar and 5-bar tracks keep their own phases across project-cycle boundaries. Notes outside a shortened track are preserved but not played; sounding notes are cut at that track's boundary. Both views show each track's length and local playhead. JSON projects retain independent lengths; MIDI export bakes repetitions into a finite arrangement covering at least the project cycle and longest track. MIDI import is linear.
 
 File dialogs support arrows, PageUp/PageDown, `Enter` to confirm, `Tab` to switch to the path field, and `Esc` to cancel. Existing files require overwrite confirmation. `Ctrl+I` also imports MIDI in terminals that distinguish it from `Tab`; otherwise use `F3`.
 

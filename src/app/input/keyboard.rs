@@ -114,7 +114,16 @@ impl App {
             ),
             K::Char('b') => self.prompt("BPM (20..300)", self.project.bpm.to_string(), Action::Bpm),
             K::Char('l') => self.prompt(
-                "Length in bars (from loop start)",
+                "Track length: bars or Nt ticks (0 = project cycle)",
+                match self.project.tracks[self.track].length {
+                    Some(length) if length.is_multiple_of(BAR) => (length / BAR).to_string(),
+                    Some(length) => format!("{length}t"),
+                    None => "0".into(),
+                },
+                Action::TrackLength,
+            ),
+            K::Char('L') => self.prompt(
+                "Project cycle length in bars (from loop start)",
                 ((self.project.loop_end - self.project.loop_start) / BAR).to_string(),
                 Action::Length,
             ),
@@ -155,7 +164,7 @@ impl App {
             K::Right => self.cursor = (self.cursor + self.grid).min(BAR * 4096 - self.grid),
             K::Up => self.key = self.key.saturating_add(1).min(127),
             K::Down => self.key = self.key.saturating_sub(1),
-            K::Home => self.cursor = self.project.loop_start,
+            K::Home => self.cursor = self.project.track_range(self.track).0,
             K::PageUp => self.key = self.key.saturating_add(12).min(127),
             K::PageDown => self.key = self.key.saturating_sub(12),
             K::Enter | K::Insert => self.toggle_note(),

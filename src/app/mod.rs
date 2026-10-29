@@ -10,6 +10,9 @@ mod routing;
 pub mod tracker;
 mod viewport;
 
+#[cfg(test)]
+mod track_length_tests;
+
 use crate::{
     audio::{AudioSink, Instruments},
     engine::{Command, Engine, NoteSnapshot},
@@ -73,7 +76,7 @@ pub struct App {
     undo: Vec<Project>,
     redo: Vec<Project>,
     drag: Option<Drag>,
-    recording_notes: HashMap<(usize, u8), (u32, u8)>,
+    recording_notes: HashMap<(usize, u8), recording::PendingRecording>,
     last_file_directory: Option<PathBuf>,
 }
 
@@ -132,6 +135,9 @@ impl App {
 
     pub fn position(&self) -> u32 {
         self.engine.position.load(Ordering::Relaxed)
+    }
+    pub fn track_position(&self, track: usize) -> u32 {
+        self.engine.track_position(track).tick
     }
     pub fn playing(&self) -> bool {
         self.engine.playing.load(Ordering::Relaxed)

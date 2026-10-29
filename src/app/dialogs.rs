@@ -18,6 +18,7 @@ pub enum Action {
     LoopStart,
     LoopEnd,
     Length,
+    TrackLength,
     EditNote,
 }
 
@@ -40,6 +41,7 @@ impl App {
                     | Action::LoopStart
                     | Action::LoopEnd
                     | Action::Length
+                    | Action::TrackLength
                     | Action::EditNote
             ),
         });
@@ -148,6 +150,16 @@ impl App {
                 anyhow::ensure!((1..=4096).contains(&bars), "Length must be 1..4096 bars");
                 candidate.loop_end = candidate.loop_start + bars * BAR;
             }
+            Action::TrackLength => {
+                let length = if let Some(ticks) = text.strip_suffix('t') {
+                    ticks.parse::<u32>()?
+                } else {
+                    let bars: u32 = text.parse()?;
+                    anyhow::ensure!(bars <= 4096, "Track length must be 0..4096 bars");
+                    bars * BAR
+                };
+                t.length = if length == 0 { None } else { Some(length) };
+            }
             Action::LoopStart | Action::LoopEnd => {
                 let bar: u32 = text.parse()?;
                 anyhow::ensure!((1..=4097).contains(&bar), "Invalid bar");
@@ -162,14 +174,22 @@ impl App {
         }
         candidate.validate()?;
         self.finish_recording();
+        // Finalizing held input notes must not be overwritten by the settings snapshot.
+        for (candidate, current) in candidate.tracks.iter_mut().zip(&self.project.tracks) {
+            candidate.notes.clone_from(&current.notes);
+        }
         self.checkpoint();
         self.project = candidate;
-        if matches!(action, Action::Length | Action::LoopStart | Action::LoopEnd) {
-            self.cursor = self
-                .cursor
-                .clamp(self.project.loop_start, self.project.loop_end - 1);
+        if matches!(
+            action,
+            Action::Length | Action::TrackLength | Action::LoopStart | Action::LoopEnd
+        ) {
+            let (start, end) = self.project.track_range(self.track);
+            self.cursor = self.cursor.clamp(start, end - 1);
             self.status = format!(
-                "Length: {} bars. Notes outside the loop are preserved.",
+                "Track {}: {} (project cycle {} bars). Notes outside its loop are preserved.",
+                self.track + 1,
+                self.project.track_length_label(self.track),
                 (self.project.loop_end - self.project.loop_start) / BAR
             );
         }

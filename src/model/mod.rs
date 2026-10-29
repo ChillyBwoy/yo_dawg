@@ -4,6 +4,9 @@ mod note;
 mod project;
 mod track;
 
+#[cfg(test)]
+mod track_tests;
+
 pub use note::Note;
 pub use project::Project;
 pub use track::{Route, Track};

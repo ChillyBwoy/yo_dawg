@@ -15,8 +15,9 @@ use ratatui::{
 pub(super) fn draw(f: &mut Frame, app: &App, area: Rect) {
     let t = &app.project.tracks[app.track];
     let title = format!(
-        " {} · {:?} · ch {} · {} · vol {} ",
+        " {} · {} · {:?} · ch {} · {} · vol {} ",
         t.name,
+        app.project.track_length_label(app.track),
         t.route,
         t.channel + 1,
         app.instrument_label(),
@@ -105,7 +106,8 @@ impl Roll<'_> {
             for x in grid.x..grid.right {
                 let tick = app.offset + ((x - grid.x) / app.cell_width) as u32 * app.grid;
                 let boundary = (x - grid.x).is_multiple_of(app.cell_width);
-                let outside = tick < app.project.loop_start || tick >= app.project.loop_end;
+                let (start, end) = app.project.track_range(app.track);
+                let outside = tick < start || tick >= end;
                 buf[(x, y)]
                     .set_symbol(if boundary && tick.is_multiple_of(BAR) {
                         "┃"
@@ -181,17 +183,17 @@ impl Roll<'_> {
 
     fn overlays(&self, area: Rect, grid: &GridArea, buf: &mut Buffer) {
         let app = self.0;
+        let (start, end) = app.project.track_range(app.track);
         for x in grid.x..grid.right {
             let tick = app.offset + (x - grid.x) as u32 * app.grid / app.cell_width as u32;
-            if tick < app.project.loop_start || tick >= app.project.loop_end {
+            if tick < start || tick >= end {
                 for y in grid.y..grid.bottom {
                     buf[(x, y)].set_style(Style::default().fg(MUTED).add_modifier(Modifier::DIM));
                 }
             }
         }
-        if app.project.loop_end >= app.offset {
-            let col = (app.project.loop_end - app.offset) as u64 * app.cell_width as u64
-                / app.grid as u64;
+        if end >= app.offset {
+            let col = (end - app.offset) as u64 * app.cell_width as u64 / app.grid as u64;
             if col < grid.width as u64 {
                 let x = grid.x + col as u16;
                 buf.set_stringn(
@@ -206,9 +208,9 @@ impl Roll<'_> {
                 }
             }
         }
-        if app.playing() && app.position() >= app.offset {
-            let col =
-                (app.position() - app.offset) as u64 * app.cell_width as u64 / app.grid as u64;
+        let position = app.track_position(app.track);
+        if app.playing() && position >= app.offset {
+            let col = (position - app.offset) as u64 * app.cell_width as u64 / app.grid as u64;
             if col < grid.width as u64 {
                 for y in grid.y..grid.bottom {
                     buf[(grid.x + col as u16, y)].set_style(

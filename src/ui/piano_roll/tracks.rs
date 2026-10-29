@@ -15,10 +15,11 @@ pub(super) fn draw(f: &mut Frame, app: &mut App, area: Rect) {
         .enumerate()
         .map(|(i, t)| {
             ListItem::new(format!(
-                "{:02} {}{} {}",
+                "{:02} {}{} {} {}",
                 i + 1,
                 if t.mute { "M" } else { "·" },
                 if t.solo { "S" } else { "·" },
+                app.project.track_length_label(i),
                 t.name
             ))
         })

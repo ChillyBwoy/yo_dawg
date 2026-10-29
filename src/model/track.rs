@@ -35,6 +35,9 @@ pub struct Track {
     pub route: Route,
     #[serde(default)]
     pub midi_output: Option<String>,
+    /// Independent loop length in ticks; None inherits the project's loop.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub length: Option<u32>,
     pub notes: Vec<Note>,
 }
 
@@ -49,6 +52,7 @@ impl Track {
             solo: false,
             route: Route::Internal,
             midi_output: None,
+            length: None,
             notes: Vec::new(),
         }
     }

@@ -33,10 +33,12 @@ pub(super) fn draw(f: &mut Frame, app: &App, area: Rect) {
     f.render_widget(
         Paragraph::new(text)
             .style(Style::default().fg(ACCENT))
-            .block(
-                Block::bordered()
-                    .title(format!(" yo_dawg · {} · F4 switch view ", app.view.label())),
-            ),
+            .block(Block::bordered().title(format!(
+                " yo_dawg · {} · Track {}: {} · F4 switch view ",
+                app.view.label(),
+                app.track + 1,
+                app.project.track_length_label(app.track)
+            ))),
         area,
     );
 }

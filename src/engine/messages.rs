@@ -19,6 +19,7 @@ pub enum Event {
         key: u8,
         velocity: u8,
         tick: u32,
+        cycle: u32,
         track: usize,
     },
 }

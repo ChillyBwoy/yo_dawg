@@ -1,90 +1,9 @@
 use crate::model::{BAR, Note, PPQ, Project, Track};
 use anyhow::{Result, bail};
-use midly::{Format, Header, MetaMessage, MidiMessage, Smf, Timing, TrackEvent, TrackEventKind};
+use midly::{Format, MetaMessage, MidiMessage, Smf, Timing, TrackEventKind};
 use std::{collections::HashMap, path::Path};
 
-pub fn export(project: &Project, path: &Path) -> Result<()> {
-    let mut tracks = vec![vec![
-        TrackEvent {
-            delta: 0.into(),
-            kind: TrackEventKind::Meta(MetaMessage::Tempo(
-                (60_000_000 / project.bpm as u32).into(),
-            )),
-        },
-        TrackEvent {
-            delta: 0.into(),
-            kind: TrackEventKind::Meta(MetaMessage::TimeSignature(4, 2, 24, 8)),
-        },
-        TrackEvent {
-            delta: 0.into(),
-            kind: TrackEventKind::Meta(MetaMessage::EndOfTrack),
-        },
-    ]];
-    for t in &project.tracks {
-        let mut events = vec![
-            (
-                0,
-                0,
-                MidiMessage::ProgramChange {
-                    program: t.program.into(),
-                },
-            ),
-            (
-                0,
-                1,
-                MidiMessage::Controller {
-                    controller: 7.into(),
-                    value: t.volume.into(),
-                },
-            ),
-        ];
-        for n in &t.notes {
-            events.push((
-                n.start,
-                3,
-                MidiMessage::NoteOn {
-                    key: n.key.into(),
-                    vel: n.velocity.into(),
-                },
-            ));
-            events.push((
-                n.start + n.duration,
-                2,
-                MidiMessage::NoteOff {
-                    key: n.key.into(),
-                    vel: 0.into(),
-                },
-            ));
-        }
-        events.sort_by_key(|e| (e.0, e.1));
-        let mut output = vec![TrackEvent {
-            delta: 0.into(),
-            kind: TrackEventKind::Meta(MetaMessage::TrackName(t.name.as_bytes())),
-        }];
-        let mut prev = 0;
-        for (time, _, message) in events {
-            output.push(TrackEvent {
-                delta: (time - prev).into(),
-                kind: TrackEventKind::Midi {
-                    channel: t.channel.into(),
-                    message,
-                },
-            });
-            prev = time;
-        }
-        output.push(TrackEvent {
-            delta: 0.into(),
-            kind: TrackEventKind::Meta(MetaMessage::EndOfTrack),
-        });
-        tracks.push(output);
-    }
-    let smf = Smf {
-        header: Header::new(Format::Parallel, Timing::Metrical((PPQ as u16).into())),
-        tracks,
-    };
-    smf.save(path)?;
-    Ok(())
-}
+pub use super::midi_export::export;
 
 pub fn import(path: &Path) -> Result<Project> {
     let bytes = std::fs::read(path)?;
@@ -135,6 +54,7 @@ fn decode(bytes: &[u8]) -> Result<Project> {
                 TrackEventKind::Meta(MetaMessage::TrackName(n)) => {
                     name = String::from_utf8_lossy(n).into_owned()
                 }
+                TrackEventKind::Meta(MetaMessage::EndOfTrack) => end = end.max(scale(time)),
                 TrackEventKind::Midi { channel, message } => {
                     let c = channel.as_int();
                     let t = channels.entry(c).or_insert_with(|| {

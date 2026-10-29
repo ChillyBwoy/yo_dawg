@@ -90,6 +90,9 @@ impl Worker {
 
     pub(super) fn panic(&mut self) {
         self.audio.send(AudioEvent::Panic);
+        for schedule in &mut self.schedule {
+            schedule.active.fill(0);
+        }
         for output in self.outputs.values_mut() {
             for channel in 0..16 {
                 let _ = output.send(&[0xB0 | channel, 64, 0]);
@@ -97,6 +100,51 @@ impl Worker {
                 let _ = output.send(&[0xB0 | channel, 120, 0]);
             }
         }
+    }
+
+    /// A local loop boundary must not send a global Panic or cut other tracks.
+    pub(super) fn release_sequence_key(&mut self, track: usize, key: u8) {
+        if self.live_notes.snapshot(track).contains(key) {
+            return;
+        }
+        let t = &self.project.tracks[track];
+        if t.route.internal() {
+            self.audio.send(AudioEvent::Off(track as u8, key));
+        }
+        let channel = t.channel;
+        if self.output_key_held_elsewhere(track, key) {
+            return;
+        }
+        self.external(track, &[0x80 | channel, key, 0]);
+    }
+
+    pub(super) fn output_key_held_elsewhere(&self, track: usize, key: u8) -> bool {
+        (0..self.project.tracks.len())
+            .any(|other| self.other_track_holds_output_key(track, other, key))
+    }
+
+    fn other_track_holds_output_key(&self, track: usize, other: usize, key: u8) -> bool {
+        if other == track || !self.project.audible(other) {
+            return false;
+        }
+        if !self.shares_midi_destination(track, other) {
+            return false;
+        }
+        if self.sequence_key_active(other, key) {
+            return true;
+        }
+        self.thru && self.live_notes.snapshot(other).contains(key)
+    }
+
+    fn shares_midi_destination(&self, track: usize, other: usize) -> bool {
+        let source = &self.project.tracks[track];
+        let Some(port) = source.midi_output.as_deref() else {
+            return false;
+        };
+        let destination = &self.project.tracks[other];
+        destination.route.external()
+            && destination.channel == source.channel
+            && destination.midi_output.as_deref() == Some(port)
     }
 
     pub(super) fn connect_input(&mut self, name: Option<String>) {
@@ -140,6 +188,9 @@ impl Worker {
     }
 
     pub(super) fn live(&mut self, data: &[u8]) {
+        if self.selected >= self.project.tracks.len() {
+            return;
+        }
         if data.len() != 3 || data[1] > 127 || data[2] > 127 {
             return;
         }
@@ -160,14 +211,19 @@ impl Worker {
         let velocity = if status == 0x90 { data[2] } else { 0 };
         self.live_notes
             .set(self.selected, channel, data[1], velocity > 0);
-        if velocity > 0 || !self.live_notes.snapshot(self.selected).contains(data[1]) {
+        if velocity > 0
+            || (!self.live_notes.snapshot(self.selected).contains(data[1])
+                && !self.sequence_key_active(self.selected, data[1]))
+        {
             self.note(self.selected, data[1], velocity, true);
         }
         if self.record && self.playing.load(Ordering::Relaxed) {
+            let position = self.track_position(self.selected);
             let _ = self.events.try_send(Event::Recorded {
                 key: data[1],
                 velocity,
-                tick: self.tick as u32,
+                tick: position.tick,
+                cycle: position.cycle,
                 track: self.selected,
             });
         }

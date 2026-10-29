@@ -3,6 +3,7 @@
 mod live_notes;
 mod messages;
 mod ports;
+mod positions;
 mod worker;
 
 use crate::{audio::AudioSink, model::Project};
@@ -11,6 +12,8 @@ use live_notes::LiveNotes;
 pub use live_notes::NoteSnapshot;
 pub use messages::{Command, Event};
 pub use ports::ports;
+pub use positions::TrackPosition;
+use positions::TrackPositions;
 use std::{
     sync::{
         Arc,
@@ -26,6 +29,7 @@ pub struct Engine {
     pub position: Arc<AtomicU32>,
     pub playing: Arc<AtomicBool>,
     live_notes: Arc<LiveNotes>,
+    track_positions: Arc<TrackPositions>,
     worker: Option<thread::JoinHandle<()>>,
 }
 
@@ -44,6 +48,7 @@ impl Engine {
             playing.clone(),
         );
         let live_notes = worker.live_notes.clone();
+        let track_positions = worker.track_positions.clone();
         let handle = thread::spawn(move || worker.run(rx));
         Self {
             tx,
@@ -51,6 +56,7 @@ impl Engine {
             position,
             playing,
             live_notes,
+            track_positions,
             worker: Some(handle),
         }
     }
@@ -61,6 +67,9 @@ impl Engine {
 
     pub fn live_notes(&self, track: usize) -> NoteSnapshot {
         self.live_notes.snapshot(track)
+    }
+    pub fn track_position(&self, track: usize) -> TrackPosition {
+        self.track_positions.get(track)
     }
 }
 

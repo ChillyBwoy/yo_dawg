@@ -100,3 +100,177 @@ fn loop_wrap_keeps_held_key_indicators() {
     w.connect_input(None);
     assert!(!w.live_notes.snapshot(0).contains(60));
 }
+
+#[test]
+fn independent_three_and_five_bar_tracks_keep_their_phases() {
+    use crate::{
+        audio::AudioEvent,
+        model::{BAR, Note, Track},
+    };
+    let mut w = worker();
+    w.project.tracks[0].length = Some(BAR * 3);
+    w.project.tracks[0].notes.push(Note {
+        start: 0,
+        duration: BAR * 10,
+        key: 60,
+        velocity: 100,
+    });
+    let mut second = Track::new(1);
+    second.length = Some(BAR * 5);
+    second.notes.push(Note {
+        start: 0,
+        duration: BAR * 10,
+        key: 64,
+        velocity: 100,
+    });
+    w.project.tracks.push(second);
+    w.configure();
+    w.advance((BAR * 4) as f64 + 0.25);
+    assert_eq!(w.tick, 0.25);
+    assert_eq!(
+        w.track_positions.get(0),
+        TrackPosition {
+            tick: BAR,
+            cycle: 1
+        }
+    );
+    assert_eq!(
+        w.track_positions.get(1),
+        TrackPosition {
+            tick: BAR * 4,
+            cycle: 0
+        }
+    );
+    let mut first_offs = 0;
+    while let Some(event) = w.audio.queue.pop() {
+        assert!(!matches!(event, AudioEvent::Panic | AudioEvent::Off(1, 64)));
+        if matches!(event, AudioEvent::Off(0, 60)) {
+            first_offs += 1;
+        }
+    }
+    assert_eq!(first_offs, 1);
+    assert!(w.sequence_key_active(1, 64));
+    w.advance(BAR as f64);
+    assert_eq!(
+        w.track_positions.get(0),
+        TrackPosition {
+            tick: BAR * 2,
+            cycle: 1
+        }
+    );
+    assert_eq!(
+        w.track_positions.get(1),
+        TrackPosition { tick: 0, cycle: 1 }
+    );
+    let mut second_offs = 0;
+    while let Some(event) = w.audio.queue.pop() {
+        assert!(!matches!(event, AudioEvent::Panic | AudioEvent::Off(0, 60)));
+        if matches!(event, AudioEvent::Off(1, 64)) {
+            second_offs += 1;
+        }
+    }
+    assert_eq!(second_offs, 1);
+    w.advance((BAR * 10) as f64 - 0.25);
+    assert_eq!(
+        w.track_positions.get(0),
+        TrackPosition { tick: 0, cycle: 5 }
+    );
+    assert_eq!(
+        w.track_positions.get(1),
+        TrackPosition { tick: 0, cycle: 3 }
+    );
+}
+
+#[test]
+fn notes_outside_track_length_are_kept_but_not_scheduled() {
+    use crate::{
+        audio::AudioEvent,
+        model::{BAR, Note},
+    };
+    let mut w = worker();
+    w.project.tracks[0].length = Some(BAR);
+    w.project.tracks[0].notes = vec![
+        Note {
+            start: BAR - 120,
+            duration: BAR,
+            key: 60,
+            velocity: 100,
+        },
+        Note {
+            start: BAR,
+            duration: 120,
+            key: 72,
+            velocity: 100,
+        },
+    ];
+    w.configure();
+    w.advance((BAR * 2) as f64);
+    let mut ons = 0;
+    let mut offs = 0;
+    while let Some(event) = w.audio.queue.pop() {
+        assert!(!matches!(event, AudioEvent::On(_, 72, _)));
+        if matches!(event, AudioEvent::On(0, 60, _)) {
+            ons += 1;
+        }
+        if matches!(event, AudioEvent::Off(0, 60)) {
+            offs += 1;
+        }
+    }
+    assert_eq!((ons, offs), (2, 2));
+    assert_eq!(w.project.tracks[0].notes.len(), 2);
+}
+
+#[test]
+fn midi_record_events_use_local_track_position_and_cycle() {
+    use crate::model::BAR;
+    let mut w = worker();
+    let (events, rx) = bounded(8);
+    w.events = events;
+    w.project.tracks[0].length = Some(BAR);
+    w.absolute_tick = (BAR * 4 + 120) as f64;
+    w.tick = 120.0;
+    w.record = true;
+    w.playing.store(true, Ordering::Relaxed);
+    w.live(&[0x90, 60, 100]);
+    assert!(matches!(
+        rx.recv().unwrap(),
+        Event::Recorded {
+            tick: 120,
+            cycle: 4,
+            ..
+        }
+    ));
+}
+
+#[test]
+fn shared_output_guard_checks_destination_activity_and_live_thru() {
+    use crate::model::{Route, Track};
+    let mut w = worker();
+    w.project.tracks[0].midi_output = Some("FM-1".into());
+    let mut other = Track::new(1);
+    other.channel = 0;
+    other.route = Route::External;
+    other.midi_output = Some("FM-1".into());
+    w.project.tracks.push(other);
+    w.rebuild_schedule();
+    w.schedule[1].active[60] = 1;
+    assert!(w.output_key_held_elsewhere(0, 60));
+    assert!(!w.output_key_held_elsewhere(0, 61));
+    w.project.tracks[1].channel = 1;
+    assert!(!w.output_key_held_elsewhere(0, 60));
+    w.project.tracks[1].channel = 0;
+    w.project.tracks[1].midi_output = Some("Other device".into());
+    assert!(!w.output_key_held_elsewhere(0, 60));
+    w.project.tracks[1].midi_output = Some("FM-1".into());
+    w.project.tracks[1].mute = true;
+    assert!(!w.output_key_held_elsewhere(0, 60));
+    w.project.tracks[1].mute = false;
+    w.project.tracks[1].route = Route::Internal;
+    assert!(!w.output_key_held_elsewhere(0, 60));
+    w.project.tracks[1].route = Route::External;
+    w.schedule[1].active[60] = 0;
+    w.live_notes.set(1, 0, 60, true);
+    assert!(!w.output_key_held_elsewhere(0, 60));
+    w.thru = true;
+    assert!(w.output_key_held_elsewhere(0, 60));
+}

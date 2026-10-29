@@ -32,13 +32,13 @@ impl App {
                 self.focus_tracker_column(next);
             }
             K::Home => {
-                self.cursor = self.project.loop_start;
+                self.cursor = self.project.track_range(self.track).0;
                 self.selected.clear();
                 self.focus_tracker_note();
                 self.ensure_tracker_time_visible();
             }
             K::End => {
-                self.cursor = (self.project.loop_end - 1) / self.grid * self.grid;
+                self.cursor = (self.project.track_range(self.track).1 - 1) / self.grid * self.grid;
                 self.selected.clear();
                 self.focus_tracker_note();
                 self.ensure_tracker_time_visible();

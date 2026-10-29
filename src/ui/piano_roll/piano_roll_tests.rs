@@ -76,3 +76,21 @@ fn stop_and_panic_clear_input_indicators() {
         wait_for_note(&app, 60, false);
     }
 }
+
+#[test]
+fn piano_roll_end_marker_uses_the_selected_tracks_length() {
+    use crate::model::BAR;
+    let mut app = app();
+    app.project.tracks[0].length = Some(BAR);
+    let original = app.project.tracks[0].notes.clone();
+    let mut terminal = Terminal::new(TestBackend::new(120, 35)).unwrap();
+    terminal.draw(|f| crate::ui::draw(f, &mut app)).unwrap();
+    let x = app.roll.x + 6 + (BAR / app.grid) as u16 * app.cell_width;
+    let y = app.roll.y + 2;
+    let buf = terminal.backend().buffer();
+    assert_eq!(buf[(x, y)].symbol(), "E");
+    assert_eq!(buf[(x + 1, y)].symbol(), "N");
+    assert_eq!(buf[(x + 2, y)].symbol(), "D");
+    assert_eq!(app.project.loop_end, BAR * 4);
+    assert_eq!(app.project.tracks[0].notes, original);
+}

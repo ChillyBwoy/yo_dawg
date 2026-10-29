@@ -104,3 +104,21 @@ fn held_midi_notes_are_highlighted_in_tracker_without_recording() {
     assert!(text(&terminal).contains("MIDI: C4"));
     assert!(!app.dirty);
 }
+
+#[test]
+fn tracker_displays_each_tracks_own_length() {
+    use crate::model::{BAR, Track};
+    let mut app = app();
+    app.project.tracks[0].length = Some(BAR);
+    let mut track = Track::new(1);
+    track.length = Some(BAR * 3);
+    app.project.tracks.push(track);
+    let mut terminal = Terminal::new(TestBackend::new(120, 35)).unwrap();
+    terminal.draw(|f| crate::ui::draw(f, &mut app)).unwrap();
+    let display = text(&terminal);
+    assert!(display.contains("01 1b"));
+    assert!(display.contains("02 3b"));
+    let x = app.tracker.area.x + TIME_WIDTH + 1;
+    let y = app.tracker.area.y + 3 + (BAR / app.grid) as u16;
+    assert_eq!(terminal.backend().buffer()[(x, y)].symbol(), "E");
+}

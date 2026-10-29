@@ -10,14 +10,14 @@ Shift+Left/Right move notes in time          Shift+Up/Down     transpose notes
 v / Ctrl+A       select note / all notes     g                 quantize selection
 Ctrl+C/X/V       copy / cut / paste          Ctrl+Z/Y          undo / redo
 p / a            instrument / add track      m / s             mute / solo
-b / l            tempo / loop length         r / c             route / MIDI channel
+b / l            tempo / track length        r / c             route / MIDI channel
 Ctrl+S/O         save / open project         Ctrl+E / F3       export / import MIDI
 F2 / F5          routing / refresh ports     F6 / F7           MIDI input / output
 R / F8 / F9      record / thru / monitor     ! / q             Panic / quit
 
 Columns: pitch, track instrument, velocity, length in ticks (480 = quarter note).
 === means a held note; OFF marks its ending row. * marks an off-grid start.
-Exact timing and overlapping notes are preserved; chords use extra columns.
+Loops: l = track length, L = project cycle; 0 inherits (~). Nt sets ticks.
 e opens: pitch velocity length start. Example: C#4 100 360 17 (or 61 for C#4).
 Mouse: click selects a cell; right click deletes; wheel scrolls time;
 Shift+wheel scrolls columns. Switching views never converts project data.

@@ -38,6 +38,15 @@ impl Project {
             bail!("Expected 1..16 tracks");
         }
         for t in &self.tracks {
+            if t.length
+                .is_some_and(|length| length == 0 || length > BAR * 4096)
+            {
+                bail!(
+                    "Invalid length in {} (expected 1..{} ticks)",
+                    t.name,
+                    BAR * 4096
+                );
+            }
             if t.channel > 15 || t.program > 127 || t.volume > 127 {
                 bail!("Invalid track parameters");
             }
@@ -57,6 +66,32 @@ impl Project {
     }
     pub fn audible(&self, index: usize) -> bool {
         !self.tracks[index].mute && (!self.tracks.iter().any(|t| t.solo) || self.tracks[index].solo)
+    }
+
+    pub fn track_range(&self, index: usize) -> (u32, u32) {
+        match self.tracks[index].length {
+            Some(length) => (0, length),
+            None => (self.loop_start, self.loop_end),
+        }
+    }
+
+    pub fn track_length(&self, index: usize) -> u32 {
+        let (start, end) = self.track_range(index);
+        end - start
+    }
+
+    pub fn track_length_label(&self, index: usize) -> String {
+        let length = self.track_length(index);
+        let value = if length.is_multiple_of(BAR) {
+            format!("{}b", length / BAR)
+        } else {
+            format!("{length}t")
+        };
+        if self.tracks[index].length.is_none() {
+            format!("~{value}")
+        } else {
+            value
+        }
     }
     pub fn demo() -> Self {
         let mut p = Self::default();

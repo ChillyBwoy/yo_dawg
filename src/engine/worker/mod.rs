@@ -3,14 +3,14 @@ mod scheduler;
 #[cfg(test)]
 mod worker_tests;
 
-use super::{Command, Event, live_notes::LiveNotes};
+use super::{Command, Event, TrackPosition, live_notes::LiveNotes, positions::TrackPositions};
 use crate::{
     audio::AudioSink,
     model::{PPQ, Project},
 };
 use crossbeam_channel::{Receiver, Sender};
 use midir::{MidiInputConnection, MidiOutputConnection};
-use scheduler::Scheduled;
+use scheduler::TrackSchedule;
 use std::{
     collections::HashMap,
     sync::{
@@ -34,9 +34,12 @@ pub(super) struct Worker {
     record: bool,
     thru: bool,
     tick: f64,
-    schedule: Vec<Scheduled>,
+    absolute_tick: f64,
+    loop_count: u64,
+    schedule: Vec<TrackSchedule>,
     dropped: Arc<AtomicBool>,
     pub(super) live_notes: Arc<LiveNotes>,
+    pub(super) track_positions: Arc<TrackPositions>,
 }
 
 impl Worker {
@@ -48,6 +51,7 @@ impl Worker {
         position: Arc<AtomicU32>,
         playing: Arc<AtomicBool>,
     ) -> Self {
+        let start = project.loop_start as f64;
         Self {
             project,
             audio,
@@ -60,16 +64,20 @@ impl Worker {
             selected: 0,
             record: false,
             thru: false,
-            tick: 0.0,
+            tick: start,
+            absolute_tick: start,
+            loop_count: 0,
             schedule: Vec::new(),
             dropped: Arc::new(AtomicBool::new(false)),
             live_notes: Arc::new(LiveNotes::default()),
+            track_positions: Arc::new(TrackPositions::default()),
         }
     }
 
     pub(super) fn run(mut self, rx: Receiver<Command>) {
         self.configure();
         self.tick = self.project.loop_start as f64;
+        self.absolute_tick = self.tick;
         let mut previous = Instant::now();
         'outer: loop {
             // Limit work per pass so incoming MIDI cannot starve the transport.
@@ -98,6 +106,8 @@ impl Worker {
                         self.live_notes.clear();
                         self.panic();
                         self.tick = self.project.loop_start as f64;
+                        self.absolute_tick = self.tick;
+                        self.loop_count = 0;
                         self.playing.store(on, Ordering::Relaxed);
                         previous = Instant::now();
                     }
@@ -136,6 +146,7 @@ impl Worker {
                 self.advance(delta.min(0.25) * self.project.bpm as f64 * PPQ as f64 / 60.0);
             }
             self.position.store(self.tick as u32, Ordering::Relaxed);
+            self.publish_track_positions();
             thread::sleep(Duration::from_millis(1));
         }
         self.live_notes.clear();
@@ -150,5 +161,29 @@ impl Worker {
 
     fn message(&self, text: impl Into<String>) {
         let _ = self.events.try_send(Event::Message(text.into()));
+    }
+
+    fn track_phase(&self, track: usize) -> f64 {
+        self.project.tracks[track]
+            .length
+            .map_or(self.tick, |length| self.absolute_tick % length as f64)
+    }
+
+    fn track_position(&self, track: usize) -> TrackPosition {
+        let cycle = self.project.tracks[track]
+            .length
+            .map_or(self.loop_count, |length| {
+                (self.absolute_tick / length as f64).floor() as u64
+            });
+        TrackPosition {
+            tick: self.track_phase(track) as u32,
+            cycle: cycle as u32,
+        }
+    }
+
+    fn publish_track_positions(&self) {
+        for track in 0..self.project.tracks.len() {
+            self.track_positions.set(track, self.track_position(track));
+        }
     }
 }

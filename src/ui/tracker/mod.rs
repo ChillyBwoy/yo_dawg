@@ -59,8 +59,9 @@ pub(super) fn draw(f: &mut Frame, app: &App, area: Rect) {
         let track = &app.project.tracks[column.track];
         let active = column.track == app.track && column.lane == app.tracker.lane;
         let header = format!(
-            "{:02} {} /{}",
+            "{:02} {} {} /{}",
             column.track + 1,
+            app.project.track_length_label(column.track),
             track.name,
             column.lane + 1
         );
@@ -81,6 +82,8 @@ pub(super) fn draw(f: &mut Frame, app: &App, area: Rect) {
             Style::default().fg(MUTED),
         );
         let held = app.engine.live_notes(column.track);
+        let (start, end) = app.project.track_range(column.track);
+        let position = app.track_position(column.track);
         for row in 0..app.tracker.visible_rows() {
             let tick = (app.tracker.top_tick / app.grid + row) * app.grid;
             if tick >= BAR * 4096 {
@@ -88,8 +91,8 @@ pub(super) fn draw(f: &mut Frame, app: &App, area: Rect) {
             }
             let y = area.y + 3 + row as u16;
             let cursor = tick / app.grid == app.cursor / app.grid && active;
-            let playing = app.playing() && tick / app.grid == app.position() / app.grid;
-            let outside = tick < app.project.loop_start || tick >= app.project.loop_end;
+            let playing = app.playing() && tick / app.grid == position / app.grid;
+            let outside = tick < start || tick >= end;
             let cell = column.cell(&app.project, tick, app.grid);
             let note_index = cell.note_index();
             let selected =
@@ -140,6 +143,9 @@ pub(super) fn draw(f: &mut Frame, app: &App, area: Rect) {
                 Cell::Empty => "...  ... ... ......".into(),
             };
             buffer.set_stringn(x + 1, y, text, (COLUMN_WIDTH - 2) as usize, style);
+            if end >= tick && end < tick + app.grid && !matches!(cell, Cell::Start(_)) {
+                buffer.set_stringn(x + 1, y, "END", 3, style.fg(Color::Yellow));
+            }
             if cursor {
                 buffer[(x, y)].set_symbol("›");
             }
@@ -157,7 +163,7 @@ fn draw_row_numbers(buffer: &mut Buffer, app: &App, area: Rect) {
         if tick >= BAR * 4096 {
             break;
         }
-        let playing = app.playing() && tick / app.grid == app.position() / app.grid;
+        let playing = app.playing() && tick / app.grid == app.track_position(app.track) / app.grid;
         let cursor = tick / app.grid == app.cursor / app.grid;
         let text = format!(
             "{}{:03}:{:02}",

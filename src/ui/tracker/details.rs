@@ -34,8 +34,9 @@ pub(in crate::ui) fn draw(f: &mut Frame, app: &App, area: Rect) {
         Paragraph::new(vec![
             Line::from(Span::styled(
                 format!(
-                    "{} · {} · {:?} · ch {} · entry {} · tick {}",
+                    "{} · {} · {} · {:?} · ch {} · entry {} · tick {}",
                     track.name,
+                    app.project.track_length_label(app.track),
                     app.instrument_label(),
                     track.route,
                     track.channel + 1,
