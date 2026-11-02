@@ -38,6 +38,16 @@ impl Project {
             bail!("Expected 1..16 tracks");
         }
         for t in &self.tracks {
+            if t.synth.state.len() > 64 * 1024 * 1024 {
+                bail!("VST3 state exceeds 64 MiB in {}", t.name);
+            }
+            if t.synth
+                .parameters
+                .values()
+                .any(|value| !value.is_finite() || !(0.0..=1.0).contains(value))
+            {
+                bail!("Invalid normalized VST3 parameter in {}", t.name);
+            }
             if t.length
                 .is_some_and(|length| length == 0 || length > BAR * 4096)
             {

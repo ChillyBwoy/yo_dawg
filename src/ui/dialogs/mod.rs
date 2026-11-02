@@ -2,6 +2,7 @@ mod file_browser;
 mod help;
 mod instrument_picker;
 mod routing;
+mod synth_panel;
 
 use crate::app::{App, Prompt};
 use ratatui::{

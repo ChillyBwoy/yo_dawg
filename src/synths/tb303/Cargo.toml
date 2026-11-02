@@ -1,0 +1,11 @@
+[package]
+name = "yo_dawg_tb303"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+path = "mod.rs"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git" }

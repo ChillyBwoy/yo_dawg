@@ -35,6 +35,8 @@ pub struct Track {
     pub route: Route,
     #[serde(default)]
     pub midi_output: Option<String>,
+    #[serde(default)]
+    pub synth: crate::vst::SynthConfig,
     /// Independent loop length in ticks; None inherits the project's loop.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub length: Option<u32>,
@@ -52,6 +54,7 @@ impl Track {
             solo: false,
             route: Route::Internal,
             midi_output: None,
+            synth: crate::vst::SynthConfig::default(),
             length: None,
             notes: Vec::new(),
         }

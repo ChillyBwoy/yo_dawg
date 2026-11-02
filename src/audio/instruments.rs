@@ -14,7 +14,7 @@ pub struct Instruments {
 
 impl Default for Instruments {
     fn default() -> Self {
-        let names = super::builtin::NAMES;
+        let names = crate::synths::basic::NAMES;
         let melodic = std::array::from_fn(|i| names.get(i).copied().unwrap_or("").to_owned());
         Self {
             drums: melodic.clone(),

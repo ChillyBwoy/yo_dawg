@@ -182,6 +182,13 @@ impl Worker {
     }
 
     fn publish_track_positions(&self) {
+        if let Some(vst) = &self.audio.vst {
+            vst.set_transport(
+                self.project.bpm as f64,
+                self.playing.load(Ordering::Relaxed),
+                self.absolute_tick / PPQ as f64,
+            );
+        }
         for track in 0..self.project.tracks.len() {
             self.track_positions.set(track, self.track_position(track));
         }

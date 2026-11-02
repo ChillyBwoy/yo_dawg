@@ -9,7 +9,7 @@ Ctrl+Left/Right  change note length          Ctrl+Up/Down      change velocity
 Shift+Left/Right move notes in time          Shift+Up/Down     transpose notes
 v / Ctrl+A       select note / all notes     g                 quantize selection
 Ctrl+C/X/V       copy / cut / paste          Ctrl+Z/Y          undo / redo
-p / a            instrument / add track      m / s             mute / solo
+p / a            synth / add track           F10 / Shift+P     TUI synth panel
 b / l            tempo / track length        r / c             route / MIDI channel
 Ctrl+S/O         save / open project         Ctrl+E / F3       export / import MIDI
 F2 / F5          routing / refresh ports     F6 / F7           MIDI input / output
@@ -22,4 +22,4 @@ e opens: pitch velocity length start. Example: C#4 100 360 17 (or 61 for C#4).
 Mouse: click selects a cell; right click deletes; wheel scrolls time;
 Shift+wheel scrolls columns. Switching views never converts project data.
 
-Any key closes help. All track, playback, recording, and file commands are shared.
+m / s: mute / solo. Any key closes help. Commands are shared between views.

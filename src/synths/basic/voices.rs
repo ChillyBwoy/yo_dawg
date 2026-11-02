@@ -1,8 +1,10 @@
-use super::AudioEvent;
-
-#[cfg(test)]
-#[path = "synth_tests.rs"]
-mod synth_tests;
+pub(super) enum AudioEvent {
+    On(u8, u8, u8),
+    Off(u8, u8),
+    Program(u8, u8),
+    Volume(u8, u8),
+    Panic,
+}
 
 #[derive(Clone, Copy, Default)]
 struct Voice {
@@ -76,7 +78,7 @@ impl BasicSynth {
                     continue;
                 }
                 let frequency = 440.0 * 2.0f32.powf((v.key as f32 - 69.0) / 12.0);
-                value += super::builtin::sample(
+                value += super::waveform::sample(
                     self.programs[v.track as usize],
                     v.phase,
                     frequency,

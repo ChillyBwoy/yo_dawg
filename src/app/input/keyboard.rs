@@ -1,5 +1,5 @@
 use crate::{
-    app::{Action, App, FileAction, InstrumentPicker, ViewMode},
+    app::{Action, App, FileAction, ViewMode},
     engine::Command,
     model::{BAR, Track},
 };
@@ -44,6 +44,7 @@ impl App {
             K::F(5) => self.refresh_ports(),
             K::F(6) => self.cycle_input(),
             K::F(7) => self.cycle_output(),
+            K::F(10) | K::Char('P') => self.toggle_synth_panel(),
             K::F(8) => {
                 self.thru = !self.thru;
                 self.engine.send(Command::Thru(self.thru));
@@ -100,13 +101,7 @@ impl App {
                 self.project.tracks[self.track].name.clone(),
                 Action::Rename,
             ),
-            K::Char('p') => {
-                self.instrument_picker = Some(InstrumentPicker {
-                    selected: self.project.tracks[self.track].program as usize,
-                    offset: 0,
-                    page_size: 10,
-                })
-            }
+            K::Char('p') => self.open_synth_picker(),
             K::Char('c') => self.prompt(
                 "MIDI channel (1..16)",
                 (self.project.tracks[self.track].channel + 1).to_string(),

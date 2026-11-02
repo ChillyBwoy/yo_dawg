@@ -1,12 +1,13 @@
 # yo_dawg
 
-A terminal MIDI sequencer for macOS and Linux with piano roll and tracker views, up to 16 tracks, built-in synthesis, and external MIDI support.
+A terminal MIDI sequencer for macOS and Linux with piano roll and tracker views, up to 16 tracks, VST3 synthesizers, and external MIDI support.
 
 ## Run
 
-Requires a recent stable Rust toolchain. On Debian/Ubuntu, install `build-essential`, `pkg-config`, and `libasound2-dev` first.
+Requires a recent stable Rust toolchain. On Debian/Ubuntu, install `build-essential`, `pkg-config`, `libasound2-dev`, and `libxcb1-dev` first.
 
 ```sh
+cargo xtask bundle -p yo_dawg_basic -p yo_dawg_tb303 --release
 cargo run --release -- --demo
 ```
 
@@ -29,7 +30,15 @@ cargo run --release -- --input 0 --output 0
 cargo run --release -- --no-audio
 ```
 
-Without a SoundFont, the built-in synthesizer provides four basic timbres. No SF2 bank is bundled.
+Basic and TB-303 are standalone VST3 plugins, built into `target/bundled/`. The app loads them through the same host as third-party plugins. For a relocated application, put the bundles in a `plugins/` directory beside its executable. They can also be installed in another DAW's standard VST3 directory.
+
+Press `p` to choose a synthesizer for the selected track, then `Enter` for its instruments or parameters. Use `←/→` to adjust parameters and `Esc` to return. Basic has 12 timbres; unused programs show `--`. `--soundfont` loads an SF2 bank inside Basic instead. No SF2 bank is bundled.
+
+`F10` or `Shift+P` toggles the selected track's synth panel inside the terminal. Ratatui and `tui-slider` render parameter cards, sliders, switches, and the TB-303 waveform selection; no external windows are opened. Use `↑/↓` to select, `←/→` to adjust, `Shift+←/→` for fine changes, `Enter` to toggle switches, and `0` to restore a parameter's default. `Ctrl+Z/Y` undo/redo and `Space` playback work inside the panel. Third-party VST3s use the same TUI for their exposed parameters; their graphical editors are not loaded. Parameter changes and plugin state are saved in the project.
+
+TB-303 is an acid-inspired monophonic synth with saw/square waves, a resonant four-pole filter, envelope modulation, decay, accent, and tuning. With Legato slide enabled, overlapping notes glide; velocity 100 or above triggers accent. It is not a circuit-exact Roland emulation.
+
+Third-party VST3 bundles are found in the OS's standard directories and in `YO_DAWG_VST3_PATH` (a colon-separated directory list). Only native plugins for the current OS and CPU work. Each track has its own instance; plugin state and parameter values are saved in JSON projects, not MIDI exports. Missing plugins leave the track silent and report an error without replacing its saved settings.
 
 ## Controls
 
@@ -43,7 +52,8 @@ Without a SoundFont, the built-in synthesizer provides four basic timbres. No SF
 | `Ctrl+←/→`, `Ctrl+↑/↓` | Note length, velocity |
 | `[` / `]`, `+` / `-` | Grid resolution, zoom |
 | `Tab` / `Shift+Tab`, `a` | Select / add a track |
-| `p`, `m`, `s` | Instrument picker, mute, solo |
+| `p`, `m`, `s` | Synthesizer / instrument picker, mute, solo |
+| `F10` / `Shift+P` | Open / close the selected track's TUI synth panel |
 | `b`, `l`, `L` | Tempo, selected track length, project cycle length |
 | `Ctrl+C/X/V`, `Ctrl+Z/Y` | Copy / cut / paste, undo / redo |
 | `Ctrl+S/O`, `Ctrl+E`, `F3` | Save / open project, export / import MIDI |
@@ -73,4 +83,4 @@ MIDI does not transmit audio. To hear the FM-1's own sound through the computer,
 
 ## Limitations
 
-Fixed 4/4 and constant tempo. No independent patterns, audio clips, plugins, audio export, or MIDI CC editing. Audio monitoring has basic resampling without clock-drift or latency compensation. Linux and FM-1 USB/BLE hardware compatibility require verification; FM-1 multitimbrality is unconfirmed.
+Fixed 4/4 and constant tempo. No independent patterns, audio clips, audio export, or MIDI CC editing. VST2, external plugin windows, crash isolation, automation lanes, and latency compensation are not implemented. Plugin-specific features not exposed as VST3 parameters cannot be controlled by the TUI. Plugins execute native code: only open trusted plugins and projects. Plugin audio is buffered on a worker thread. Audio monitoring has basic resampling without clock-drift compensation. Linux and FM-1 USB/BLE hardware compatibility require verification; FM-1 multitimbrality is unconfirmed.

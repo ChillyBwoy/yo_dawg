@@ -1,13 +1,11 @@
 //! Audio device lifecycle, real-time rendering, synthesis, and input monitoring.
 
-mod builtin;
 mod devices;
 mod events;
 mod instruments;
 mod monitor;
 mod renderer;
 mod streams;
-mod synth;
 
 use anyhow::{Context, Result, bail};
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
@@ -51,10 +49,12 @@ impl Audio {
             .as_ref()
             .map(|sf| Instruments::from_soundfont(sf))
             .unwrap_or_default();
-        let sink = AudioSink {
+        let mut sink = AudioSink {
             queue: Arc::new(ArrayQueue::new(4096)),
             overflow: Arc::new(AtomicBool::new(false)),
             monitor: Arc::new(AtomicBool::new(options.input.is_some())),
+            vst: None,
+            soundfont: options.soundfont.clone(),
         };
         if options.disabled {
             return Ok(Self {
@@ -75,6 +75,12 @@ impl Audio {
                 .context("No default audio output; try --no-audio")?,
         };
         let config = output.default_output_config()?;
+        sink.vst = Some(crate::vst::Client::start(
+            config.sample_rate().0,
+            sink.queue.clone(),
+            sink.overflow.clone(),
+            errors.clone(),
+        )?);
         let input_queue = Arc::new(ArrayQueue::new(32768));
         let mut input_rate = config.sample_rate().0;
         let input_stream = if let Some(index) = options.input {
@@ -104,7 +110,6 @@ impl Audio {
         let renderer = Renderer::new(
             config.sample_rate().0,
             input_rate,
-            soundfont,
             sink.clone(),
             input_queue,
         )?;

@@ -1,20 +1,5 @@
 //! Built-in additive timbres shared by synthesis and the instrument picker.
 
-pub(super) const NAMES: [&str; 12] = [
-    "Soft_Sine",
-    "Bright_Sine",
-    "Rich_Sine",
-    "Pure_Sine",
-    "Triangle",
-    "Organ",
-    "Reed",
-    "Strings",
-    "Brass",
-    "Bell",
-    "Electric_Piano",
-    "Bass",
-];
-
 pub(super) fn sample(program: u8, phase: f32, frequency: f32, rate: f32, age: f32) -> f32 {
     let angle = phase * std::f32::consts::TAU;
     let partial = |multiple: f32| {

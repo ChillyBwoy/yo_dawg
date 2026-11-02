@@ -18,6 +18,8 @@ pub struct AudioSink {
     pub queue: Arc<ArrayQueue<AudioEvent>>,
     pub overflow: Arc<AtomicBool>,
     pub monitor: Arc<AtomicBool>,
+    pub vst: Option<crate::vst::Client>,
+    pub soundfont: Option<std::path::PathBuf>,
 }
 
 impl AudioSink {

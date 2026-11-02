@@ -1,9 +1,9 @@
-use super::*;
+use super::{voices::*, *};
 
 #[test]
 fn builtin_programs_render_distinct_finite_audio() {
     let mut sounds = Vec::new();
-    for program in 0..super::super::builtin::NAMES.len() as u8 {
+    for program in 0..names::NAMES.len() as u8 {
         let mut synth = BasicSynth::new(48_000);
         synth.event(AudioEvent::Program(0, program));
         synth.event(AudioEvent::On(0, 60, 100));
@@ -31,7 +31,7 @@ fn original_four_timbres_are_unchanged() {
         let angle = 0.123 * std::f32::consts::TAU;
         let expected = angle.sin() + harmonic * (angle * 2.0).sin();
         assert_eq!(
-            super::super::builtin::sample(program as u8, 0.123, 440.0, 48_000.0, 0.1),
+            waveform::sample(program as u8, 0.123, 440.0, 48_000.0, 0.1),
             expected
         );
     }

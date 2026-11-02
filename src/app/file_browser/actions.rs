@@ -38,6 +38,25 @@ impl App {
     pub(super) fn apply_file_action(&mut self, action: FileAction, path: &Path) -> Result<()> {
         match action {
             FileAction::SaveProject => {
+                self.poll_synths();
+                self.finish_recording();
+                if let Some(vst) = &self.audio.vst {
+                    for (track, state) in vst.snapshot()? {
+                        let parameters = vst.parameters(track)?;
+                        if let Some(saved_track) = self.project.tracks.get_mut(track) {
+                            if saved_track.synth.kind == crate::vst::SynthKind::Basic {
+                                if let Some(program) =
+                                    parameters.iter().find(|p| p.name == "Program")
+                                {
+                                    saved_track.program = (program.value * 127.0).round() as u8;
+                                }
+                            }
+                            saved_track.synth.state = state;
+                            saved_track.synth.parameters =
+                                parameters.into_iter().map(|p| (p.id, p.value)).collect();
+                        }
+                    }
+                }
                 project::save(&self.project, path)?;
                 self.path = path.to_owned();
                 self.dirty = false;

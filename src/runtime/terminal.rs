@@ -41,6 +41,7 @@ pub(super) fn run(app: &mut App, errors: Receiver<String>) -> Result<()> {
             app.status = error;
         }
         if last_frame.elapsed() >= Duration::from_millis(33) {
+            app.poll_synths();
             terminal.draw(|frame| ui::draw(frame, app))?;
             last_frame = Instant::now();
         }

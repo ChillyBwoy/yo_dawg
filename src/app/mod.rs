@@ -7,9 +7,12 @@ mod history;
 mod input;
 mod recording;
 mod routing;
+mod synth_panel;
 pub mod tracker;
 mod viewport;
 
+#[cfg(test)]
+mod synth_picker_tests;
 #[cfg(test)]
 mod track_length_tests;
 
@@ -18,7 +21,7 @@ use crate::{
     engine::{Command, Engine, NoteSnapshot},
     model::{Note, PPQ, Project},
 };
-pub use dialogs::{Action, InstrumentPicker, Prompt};
+pub use dialogs::{Action, InstrumentPicker, Prompt, SynthPage};
 pub use file_browser::{BrowserFocus, FileAction, FileBrowser};
 use ratatui::layout::Rect;
 use std::{
@@ -130,6 +133,7 @@ impl App {
             last_file_directory: None,
         };
         app.refresh_ports();
+        app.configure_synths();
         app
     }
 
@@ -147,10 +151,34 @@ impl App {
     }
     pub fn instrument_label(&self) -> String {
         let t = &self.project.tracks[self.track];
+        if t.synth.kind != crate::vst::SynthKind::Basic {
+            return t.synth.kind.name();
+        }
         self.instruments.label(t.program, self.track, t.route)
     }
-    pub fn sync(&self) {
+    pub fn sync(&mut self) {
+        self.configure_synths();
         self.engine.send(Command::Project(self.project.clone()));
+    }
+
+    fn configure_synths(&mut self) {
+        if let Some(vst) = &self.audio.vst {
+            for track in &mut self.project.tracks {
+                if track.synth.kind == crate::vst::SynthKind::Basic
+                    && track.synth.state.is_empty()
+                    && track.synth.soundfont.is_none()
+                {
+                    track.synth.soundfont = self.audio.soundfont.clone();
+                }
+            }
+            match vst.configure(&self.project.tracks) {
+                Ok(errors) if !errors.is_empty() => {
+                    self.status = errors.join("; ");
+                }
+                Ok(_) => {}
+                Err(error) => self.status = format!("VST3: {error:#}"),
+            }
+        }
     }
 
     pub fn select_track(&mut self, index: usize) {
@@ -165,10 +193,19 @@ impl App {
     }
 
     fn request_quit(&mut self) {
+        self.poll_synths();
         if self.dirty {
             self.quit_confirm = true;
         } else {
             self.quit = true;
+        }
+    }
+}
+
+impl Drop for App {
+    fn drop(&mut self) {
+        if let Some(vst) = &self.audio.vst {
+            vst.shutdown();
         }
     }
 }
