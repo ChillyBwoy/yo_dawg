@@ -1,10 +1,15 @@
 use super::AudioEvent;
 
+#[cfg(test)]
+#[path = "synth_tests.rs"]
+mod synth_tests;
+
 #[derive(Clone, Copy, Default)]
 struct Voice {
     track: u8,
     key: u8,
     phase: f32,
+    age: f32,
     level: f32,
     release: bool,
 }
@@ -45,6 +50,7 @@ impl BasicSynth {
                     track: c,
                     key: k,
                     phase: 0.0,
+                    age: 0.0,
                     level: v as f32 / 127.0,
                     release: false,
                 };
@@ -69,20 +75,18 @@ impl BasicSynth {
                 if v.level <= 0.0001 {
                     continue;
                 }
-                let angle = v.phase * std::f32::consts::TAU;
-                let harmonic = match self.programs[v.track as usize] % 4 {
-                    0 => 0.2,
-                    1 => 0.5,
-                    2 => 0.8,
-                    _ => 0.0,
-                };
-                value += (angle.sin() + harmonic * (angle * 2.0).sin())
-                    * v.level
+                let frequency = 440.0 * 2.0f32.powf((v.key as f32 - 69.0) / 12.0);
+                value += super::builtin::sample(
+                    self.programs[v.track as usize],
+                    v.phase,
+                    frequency,
+                    self.sample_rate,
+                    v.age,
+                ) * v.level
                     * self.volumes[v.track as usize]
                     * 0.08;
-                v.phase = (v.phase
-                    + 440.0 * 2.0f32.powf((v.key as f32 - 69.0) / 12.0) / self.sample_rate)
-                    .fract();
+                v.phase = (v.phase + frequency / self.sample_rate).fract();
+                v.age += 1.0 / self.sample_rate;
                 if v.release {
                     v.level *= (-1.0 / (0.025 * self.sample_rate)).exp();
                 }

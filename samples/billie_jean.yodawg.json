@@ -7,7 +7,7 @@
     {
       "name": "Track 1",
       "channel": 0,
-      "program": 1,
+      "program": 11,
       "volume": 100,
       "mute": false,
       "solo": true,
@@ -67,7 +67,7 @@
     {
       "name": "Track 2",
       "channel": 1,
-      "program": 0,
+      "program": 10,
       "volume": 100,
       "mute": false,
       "solo": true,

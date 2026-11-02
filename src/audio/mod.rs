@@ -1,5 +1,6 @@
 //! Audio device lifecycle, real-time rendering, synthesis, and input monitoring.
 
+mod builtin;
 mod devices;
 mod events;
 mod instruments;
